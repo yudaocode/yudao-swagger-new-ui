@@ -7,11 +7,11 @@ export default defineConfig({
   server: {
     proxy: {
       '/v3': {
-        target: 'http://127.0.0.1:6618',
+        target: 'http://127.0.0.1:8080/admin',
         changeOrigin: true,
       },
       '/api': {
-        target: 'http://127.0.0.1:6618',
+        target: 'http://127.0.0.1:8080/admin',
         changeOrigin: true,
       },
     },
