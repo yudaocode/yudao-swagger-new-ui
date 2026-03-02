@@ -1,8 +1,12 @@
 server:
   port: 8080
+  servlet:
+    # 所有接口都会带上 /api 前缀，例如原接口 /user 会变成 /api/user
+    context-path: /admin
+
 spring:
   application:
     name: swagger-ui-example
-springdoc:
-  api-docs:
-    path: /v3/api-docs
+
+swagger-ui:
+  base-url: ${server.servlet.context-path}
