@@ -604,6 +604,8 @@
   gap: 8px;
   padding: 0 16px;
   height: 36px;
+  min-height: 36px;
+  flex-shrink: 0;
   background-color: var(--accent-green);
   border-radius: var(--radius-sm);
   border: none;
