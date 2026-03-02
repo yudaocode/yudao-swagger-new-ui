@@ -10,7 +10,9 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>swagger-ui-java</module>
+        <module>swagger-ui-spring-boot2</module>
+        <module>swagger-ui-spring-boot3</module>
+        <module>examples</module>
     </modules>
 
     <properties>
