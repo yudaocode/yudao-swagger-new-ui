@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react'
 
-function Sidebar({ endpoints, selectedEndpoint, onSelectEndpoint, theme, onToggleTheme, apiInfo, width }) {
+function Sidebar({ endpoints, selectedEndpoint, onSelectEndpoint, apiInfo, width }) {
   const [searchTerm, setSearchTerm] = useState('')
 
   const filteredEndpoints = useMemo(() => {
@@ -39,25 +39,6 @@ function Sidebar({ endpoints, selectedEndpoint, onSelectEndpoint, theme, onToggl
             </svg>
             <span className="logo-text">{apiInfo?.title || 'swagger'}</span>
           </div>
-          <button className="theme-toggle" onClick={onToggleTheme} aria-label="Toggle theme">
-            {theme === 'dark' ? (
-              <svg className="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="12" cy="12" r="5"></circle>
-                <line x1="12" y1="1" x2="12" y2="3"></line>
-                <line x1="12" y1="21" x2="12" y2="23"></line>
-                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-                <line x1="1" y1="12" x2="3" y2="12"></line>
-                <line x1="21" y1="12" x2="23" y2="12"></line>
-                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-              </svg>
-            ) : (
-              <svg className="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-              </svg>
-            )}
-          </button>
         </div>
         <span className="subtitle">// {apiInfo?.description || 'api documentation'}</span>
         {apiInfo?.version && <span className="api-version">v{apiInfo.version}</span>}
@@ -93,36 +74,38 @@ function Sidebar({ endpoints, selectedEndpoint, onSelectEndpoint, theme, onToggl
       </div>
 
       <nav className="nav-section">
-        <span className="nav-label">
-          endpoints
-          {searchTerm && (
-            <span className="search-count">({filteredEndpoints.length})</span>
-          )}
-        </span>
-        {Object.keys(groupedEndpoints).length === 0 ? (
-          <div className="no-results">No matching endpoints</div>
-        ) : (
-          Object.entries(groupedEndpoints).map(([group, eps]) => (
-            <div key={group} className="nav-group">
-              <span className="group-label">{group}</span>
-              {eps.map((ep) => (
-                <div
-                  key={`${ep.method} ${ep.path}`}
-                  className={`nav-item ${selectedEndpoint === `${ep.method} ${ep.path}` ? 'active' : ''}`}
-                  onClick={() => onSelectEndpoint(`${ep.method} ${ep.path}`)}
-                >
-                  <div className="nav-item-left">
-                    <span className={`method ${ep.method.toLowerCase()}`}>{ep.method}</span>
-                    <span className="path">{ep.path}</span>
+        <div className="nav-section-inner">
+          <span className="nav-label">
+            endpoints
+            {searchTerm && (
+              <span className="search-count">({filteredEndpoints.length})</span>
+            )}
+          </span>
+          {Object.keys(groupedEndpoints).length === 0 ? (
+            <div className="no-results">No matching endpoints</div>
+          ) : (
+            Object.entries(groupedEndpoints).map(([group, eps]) => (
+              <div key={group} className="nav-group">
+                <span className="group-label">{group}</span>
+                {eps.map((ep) => (
+                  <div
+                    key={`${ep.method} ${ep.path}`}
+                    className={`nav-item ${selectedEndpoint === `${ep.method} ${ep.path}` ? 'active' : ''}`}
+                    onClick={() => onSelectEndpoint(`${ep.method} ${ep.path}`)}
+                  >
+                    <div className="nav-item-left">
+                      <span className={`method ${ep.method.toLowerCase()}`}>{ep.method}</span>
+                      <span className="path">{ep.path}</span>
+                    </div>
+                    {ep.operation?.summary && (
+                      <span className="nav-summary">{ep.operation.summary}</span>
+                    )}
                   </div>
-                  {ep.operation?.summary && (
-                    <span className="nav-summary">{ep.operation.summary}</span>
-                  )}
-                </div>
-              ))}
-            </div>
-          ))
-        )}
+                ))}
+              </div>
+            ))
+          )}
+        </div>
       </nav>
     </aside>
   )

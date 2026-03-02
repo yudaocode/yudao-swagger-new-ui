@@ -1,7 +1,11 @@
 import React, { useState, useMemo } from 'react'
 
-function MainContent({ endpoint, operation, apiData }) {
-  const [tryItOut, setTryItOut] = useState(false)
+function MainContent({ endpoint, operation, apiData, theme, onToggleTheme }) {
+  const [activeLang, setActiveLang] = useState('curl')
+  const [requestBody, setRequestBody] = useState('')
+  const [responseData, setResponseData] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [paramValues, setParamValues] = useState({})
 
   const resolveRef = useMemo(() => {
     const schemas = apiData?.components?.schemas || {}
@@ -97,19 +101,32 @@ function MainContent({ endpoint, operation, apiData }) {
     return null
   }
 
-  const requestBodyExample = requestBodySchema
-    ? formatJson(getSchemaExample(requestBodySchema) || {})
-    : formatJson({})
+  const requestBodyExample = useMemo(() => {
+    return requestBodySchema
+      ? formatJson(getSchemaExample(requestBodySchema) || {})
+      : formatJson({})
+  }, [requestBodySchema])
 
-  const successResponse = responses.find(r => r.statusCode === '200' || r.statusCode === '201') || responses[0]
-  const responseBody = successResponse?.schema
-    ? formatJson(getSchemaExample(successResponse.schema) || { success: true })
-    : formatJson({ success: true })
+  // Track previous operation to reset values only when operation changes
+  const prevOperationRef = React.useRef(null)
+
+  // Initialize request body and params when operation changes
+  React.useEffect(() => {
+    if (prevOperationRef.current !== operation) {
+      prevOperationRef.current = operation
+      setRequestBody(requestBodyExample)
+      const initialValues = {}
+      const params = op?.parameters || []
+      params.forEach(param => {
+        initialValues[`${param.in}_${param.name}`] = ''
+      })
+      setParamValues(initialValues)
+    }
+  }, [operation])
 
   const parameters = op?.parameters || []
-
-  const groupParametersByType = (params) => {
-    return params.reduce((acc, param) => {
+  const groupedParams = useMemo(() => {
+    return parameters.reduce((acc, param) => {
       const type = param.in || 'query'
       if (!acc[type]) {
         acc[type] = []
@@ -117,9 +134,182 @@ function MainContent({ endpoint, operation, apiData }) {
       acc[type].push(param)
       return acc
     }, {})
+  }, [parameters])
+
+  const getBaseUrl = () => {
+    const servers = apiData?.servers || []
+    if (servers.length > 0) {
+      return servers[0].url
+    }
+    return ''
   }
 
-  const groupedParams = groupParametersByType(parameters)
+  // Generate code examples
+  const codeExamples = useMemo(() => {
+    if (!path || !method) {
+      return { curl: '', java: '', nodejs: '', python: '' }
+    }
+
+    const baseUrl = getBaseUrl()
+    const fullPath = path.replace(/\{(\w+)\}/g, (_, key) => {
+      const val = paramValues[`path_${key}`] || `{${key}}`
+      return val
+    })
+    const url = `${baseUrl}${fullPath}`
+
+    // Build headers
+    const requestHeaders = {
+      'Content-Type': 'application/json',
+    }
+    if (op?.security) {
+      requestHeaders['Authorization'] = 'Bearer <your_token>'
+    }
+
+    // Build query params
+    const queryParams = []
+    if (groupedParams.query) {
+      groupedParams.query.forEach(param => {
+        const val = paramValues[`query_${param.name}`]
+        if (val) {
+          queryParams.push(`${param.name}=${encodeURIComponent(val)}`)
+        }
+      })
+    }
+    const queryString = queryParams.length > 0 ? `?${queryParams.join('&')}` : ''
+
+    const curlHeaders = Object.entries(requestHeaders)
+      .map(([k, v]) => `  -H "${k}: ${v}"`)
+      .join(' \\\n')
+
+    const curl = `curl -X ${method.toUpperCase()} \\
+  "${url}${queryString}" \\
+${curlHeaders}${requestBodySchema ? ` \\
+  -d '${requestBody.replace(/'/g, "\\'")}'` : ''}`
+
+    const java = `import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.util.HashMap;
+import java.util.Map;
+
+public class ApiRequest {
+    public static void main(String[] args) throws Exception {
+        HttpClient client = HttpClient.newHttpClient();
+        String url = "${url}${queryString}";
+
+        Map<String, String> headers = new HashMap<>();
+        ${Object.entries(requestHeaders).map(([k, v]) => `headers.put("${k}", "${v}");`).join('\n        ')}
+
+        HttpRequest.Builder builder = HttpRequest.newBuilder()
+            .uri(URI.create(url))
+            .${method.toLowerCase()}(HttpRequest.BodyPublishers${requestBodySchema ? `.ofString(${JSON.stringify(requestBody)})` : '.noBody()'});
+
+        headers.forEach(builder::header);
+
+        HttpResponse<String> response = client.send(
+            builder.build(),
+            HttpResponse.BodyHandlers.ofString()
+        );
+
+        System.out.println(response.body());
+    }
+}`
+
+    const nodejs = `const fetch = require('node-fetch');
+
+const url = "${url}${queryString}";
+const options = {
+  method: '${method.toUpperCase()}',
+  headers: {
+${Object.entries(requestHeaders).map(([k, v]) => `    '${k}': '${v}'`).join(',\n')}
+  }${requestBodySchema ? `,
+  body: ${JSON.stringify(requestBody)}` : ''}
+};
+
+fetch(url, options)
+  .then(res => res.json())
+  .then(json => console.log(json))
+  .catch(err => console.error('error:' + err));`
+
+    const python = `import requests
+
+url = "${url}${queryString}"
+
+headers = {
+${Object.entries(requestHeaders).map(([k, v]) => `    "${k}": "${v}"`).join(',\n')}
+}
+${requestBodySchema ? `
+payload = ${requestBody}
+` : ''}
+response = requests.${method.toLowerCase()}(
+    url,
+    headers=headers${requestBodySchema ? ',\n    json=payload' : ''}
+)
+
+print(response.status_code)
+print(response.json())`
+
+    return { curl, java, nodejs, python }
+  }, [method, path, requestBody, paramValues, groupedParams, apiData, requestBodySchema, op?.security])
+
+  const handleParamChange = (paramType, paramName, value) => {
+    setParamValues(prev => ({
+      ...prev,
+      [`${paramType}_${paramName}`]: value
+    }))
+  }
+
+  const handleSendRequest = async () => {
+    setLoading(true)
+    setResponseData(null)
+
+    try {
+      let fullPath = path.replace(/\{(\w+)\}/g, (_, key) => {
+        return paramValues[`path_${key}`] || `{${key}}`
+      })
+
+      const queryParams = []
+      if (groupedParams.query) {
+        groupedParams.query.forEach(param => {
+          const val = paramValues[`query_${param.name}`]
+          if (val) {
+            queryParams.push(`${param.name}=${encodeURIComponent(val)}`)
+          }
+        })
+      }
+      const queryString = queryParams.length > 0 ? `?${queryParams.join('&')}` : ''
+
+      const headers = {
+        'Content-Type': 'application/json',
+      }
+
+      const options = {
+        method: method.toUpperCase(),
+        headers,
+      }
+
+      if (requestBodySchema && requestBody) {
+        options.body = requestBody
+      }
+
+      const response = await fetch(fullPath + queryString, options)
+      const data = await response.json()
+
+      setResponseData({
+        status: response.status,
+        statusText: response.statusText,
+        data,
+      })
+    } catch (error) {
+      setResponseData({
+        error: true,
+        message: error.message,
+      })
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const renderSchemaProperties = (schema, prefix = '', level = 0) => {
     if (!schema) return null
@@ -128,9 +318,13 @@ function MainContent({ endpoint, operation, apiData }) {
       const refName = schema.$ref?.replace('#/components/schemas/', '')
       return (
         <div key={`${prefix}-ref`} className="param-row" style={{ paddingLeft: `${level * 16}px` }}>
-          <span className="param-name">{prefix || refName}</span>
-          <span className="param-type ref-type">{refName}</span>
-          <span className="param-desc"></span>
+          <div className="param-col-left">
+            <span className="param-name">{prefix || refName}</span>
+            <span className="param-type ref-type">{refName}</span>
+          </div>
+          <div className="param-col-right">
+            <span className="param-desc"></span>
+          </div>
         </div>
       )
     }
@@ -142,9 +336,13 @@ function MainContent({ endpoint, operation, apiData }) {
       return (
         <React.Fragment key={`${prefix}-array`}>
           <div className="param-row" style={{ paddingLeft: `${level * 16}px` }}>
-            <span className="param-name">{prefix}</span>
-            <span className="param-type">array</span>
-            <span className="param-desc">{schema.description || ''}</span>
+            <div className="param-col-left">
+              <span className="param-name">{prefix}</span>
+              <span className="param-type">array</span>
+            </div>
+            <div className="param-col-right">
+              <span className="param-desc">{schema.description || ''}</span>
+            </div>
           </div>
           {hasNestedProperties && renderSchemaProperties(items, `${prefix}[]`, level + 1)}
         </React.Fragment>
@@ -157,9 +355,13 @@ function MainContent({ endpoint, operation, apiData }) {
       if (prefix) {
         elements.push(
           <div key={`${prefix}-obj-header`} className="param-row" style={{ paddingLeft: `${level * 16}px` }}>
-            <span className="param-name">{prefix}</span>
-            <span className="param-type">object</span>
-            <span className="param-desc">{schema.description || ''}</span>
+            <div className="param-col-left">
+              <span className="param-name">{prefix}</span>
+              <span className="param-type">object</span>
+            </div>
+            <div className="param-col-right">
+              <span className="param-desc">{schema.description || ''}</span>
+            </div>
           </div>
         )
       }
@@ -176,15 +378,20 @@ function MainContent({ endpoint, operation, apiData }) {
           elements.push(
             <React.Fragment key={fullKey}>
               <div className="param-row" style={{ paddingLeft: `${(prefix ? level + 1 : level) * 16}px` }}>
-                <span className="param-name">
-                  {fullKey}
-                  {required && <span className="required">*</span>}
-                </span>
-                <span className="param-type">
-                  {prop.$ref ? prop.$ref.replace('#/components/schemas/', '') : prop.type || 'string'}
-                  {prop.format && ` (${prop.format})`}
-                </span>
-                <span className="param-desc">{prop.description || ''}</span>
+                <div className="param-col-left">
+                  <span className="param-name">
+                    {fullKey}
+                    {required && <span className="required">*</span>}
+                  </span>
+                  <span className="param-type">
+                    {prop.$ref ? prop.$ref.replace('#/components/schemas/', '') : prop.type || 'string'}
+                    {prop.format && ` (${prop.format})`}
+                  </span>
+                </div>
+                <div className="param-col-right">
+                  <span className="param-desc">{prop.description || ''}</span>
+                  {required && <span className="param-meta">required</span>}
+                </div>
               </div>
               {renderSchemaProperties(prop, fullKey, prefix ? level + 1 : level)}
             </React.Fragment>
@@ -192,15 +399,20 @@ function MainContent({ endpoint, operation, apiData }) {
         } else {
           elements.push(
             <div key={fullKey} className="param-row" style={{ paddingLeft: `${(prefix ? level + 1 : level) * 16}px` }}>
-              <span className="param-name">
-                {fullKey}
-                {required && <span className="required">*</span>}
-              </span>
-              <span className="param-type">
-                {prop.type || 'string'}
-                {prop.format && ` (${prop.format})`}
-              </span>
-              <span className="param-desc">{prop.description || ''}</span>
+              <div className="param-col-left">
+                <span className="param-name">
+                  {fullKey}
+                  {required && <span className="required">*</span>}
+                </span>
+                <span className="param-type">
+                  {prop.type || 'string'}
+                  {prop.format && ` (${prop.format})`}
+                </span>
+              </div>
+              <div className="param-col-right">
+                <span className="param-desc">{prop.description || ''}</span>
+                {required && <span className="param-meta">required</span>}
+              </div>
             </div>
           )
         }
@@ -215,6 +427,33 @@ function MainContent({ endpoint, operation, apiData }) {
   if (!operation) {
     return (
       <main className="main-content">
+        <div className="content-toolbar">
+          <button className="toolbar-btn theme-toggle" onClick={onToggleTheme} aria-label="Toggle theme">
+            {theme === 'dark' ? (
+              <svg className="toolbar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+              </svg>
+            ) : (
+              <svg className="toolbar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+              </svg>
+            )}
+          </button>
+          <button className="toolbar-btn settings-btn" aria-label="Settings">
+            <svg className="toolbar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0-1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+          </button>
+        </div>
         <div className="content-header">
           <p className="endpoint-desc">Select an endpoint from the sidebar</p>
         </div>
@@ -224,6 +463,33 @@ function MainContent({ endpoint, operation, apiData }) {
 
   return (
     <main className="main-content">
+      <div className="content-toolbar">
+        <button className="toolbar-btn theme-toggle" onClick={onToggleTheme} aria-label="Toggle theme">
+          {theme === 'dark' ? (
+            <svg className="toolbar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+          ) : (
+            <svg className="toolbar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+          )}
+        </button>
+        <button className="toolbar-btn settings-btn" aria-label="Settings">
+          <svg className="toolbar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0-1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </button>
+      </div>
       <div className="content-header">
         <div className="endpoint-header">
           <div className={`method-badge ${method.toLowerCase()}`}>{method}</div>
@@ -243,109 +509,189 @@ function MainContent({ endpoint, operation, apiData }) {
         </div>
       </div>
 
-      <div className="content-body">
-        {Object.keys(groupedParams).length > 0 && (
-          <div className="params-section">
-            <div className="params-header">
-              <span className="params-title">parameters</span>
-              <svg className="toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <polyline points="6 9 12 15 18 9"></polyline>
-              </svg>
-            </div>
-            <div className="params-table">
-              {Object.entries(groupedParams).map(([paramType, params]) => (
-                <React.Fragment key={paramType}>
-                  <div className="param-type-header">{paramType}</div>
-                  {params.map((param, idx) => (
-                    <div key={idx} className="param-row">
-                      <span className="param-name">
-                        {param.name}
-                        {param.required && <span className="required">*</span>}
-                      </span>
-                      <span className="param-type">{param.schema?.type || 'string'}</span>
-                      <span className="param-desc">{param.description || ''}</span>
-                    </div>
-                  ))}
-                </React.Fragment>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {requestBodySchema && (
-          <div className="params-section">
-            <div className="params-header">
-              <span className="params-title">request body</span>
-              <svg className="toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <polyline points="6 9 12 15 18 9"></polyline>
-              </svg>
-            </div>
-            {op.requestBody?.description && (
-              <p className="section-desc">{op.requestBody.description}</p>
-            )}
-            <div className="params-table">
-              {renderSchemaProperties(requestBodySchema)}
-            </div>
-          </div>
-        )}
-
-        {responses.length > 0 && (
-          <div className="params-section">
-            <div className="params-header">
-              <span className="params-title">responses</span>
-              <svg className="toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <polyline points="6 9 12 15 18 9"></polyline>
-              </svg>
-            </div>
-            <div className="responses-list">
-              {responses.map((response) => (
-                <div key={response.statusCode} className="response-item">
-                  <div className="response-status">
-                    <span className={`status-code ${response.statusCode.startsWith('2') ? 'success' : ''}`}>
-                      {response.statusCode}
-                    </span>
-                    <span className="response-desc">{response.description}</span>
-                  </div>
-                  {response.schema && (
-                    <div className="response-schema">
-                      {renderSchemaProperties(response.schema)}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        <div className="try-section">
-          <div className="try-header">
-            <span className="try-title">try_it_out</span>
-            <button className="try-button" onClick={() => setTryItOut(!tryItOut)}>
-              {tryItOut ? 'cancel' : 'execute'}
-            </button>
-          </div>
-
-          {tryItOut && (
-            <>
-              {requestBodySchema && (
-                <div className="request-section">
-                  <span className="request-label">&gt; request</span>
-                  <div className="request-box">
-                    <pre className="code-block">{requestBodyExample}</pre>
-                  </div>
-                </div>
-              )}
-
-              <div className="response-section">
-                <div className="response-header">
-                  <span className="response-label">&gt; response</span>
-                  <span className="status-badge">200 OK</span>
-                </div>
-                <div className="response-box">
-                  <pre className="code-block">{responseBody}</pre>
-                </div>
+      <div className="content-body-split">
+        {/* Left: Documentation */}
+        <div className="doc-panel">
+          {Object.keys(groupedParams).length > 0 && (
+            <div className="params-section">
+              <div className="params-header">
+                <span className="params-title">parameters</span>
+                <svg className="toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
               </div>
-            </>
+              <div className="params-table">
+                {Object.entries(groupedParams).map(([paramType, params]) => (
+                  <React.Fragment key={paramType}>
+                    <div className="param-type-header">{paramType}</div>
+                    {params.map((param, idx) => (
+                      <div key={idx} className="param-row">
+                        <div className="param-col-left">
+                          <span className="param-name">
+                            {param.name}
+                            {param.required && <span className="required">*</span>}
+                          </span>
+                          <span className="param-type">{param.schema?.type || 'string'}</span>
+                        </div>
+                        <div className="param-col-right">
+                          <span className="param-desc">{param.description || ''}</span>
+                          {param.required && <span className="param-meta">required</span>}
+                        </div>
+                      </div>
+                    ))}
+                  </React.Fragment>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {requestBodySchema && (
+            <div className="params-section">
+              <div className="params-header">
+                <span className="params-title">request body</span>
+                <svg className="toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </div>
+              {op.requestBody?.description && (
+                <p className="section-desc">{op.requestBody.description}</p>
+              )}
+              <div className="params-table">
+                {renderSchemaProperties(requestBodySchema)}
+              </div>
+            </div>
+          )}
+
+          {responses.length > 0 && (
+            <div className="params-section">
+              <div className="params-header">
+                <span className="params-title">responses</span>
+                <svg className="toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </div>
+              <div className="responses-list">
+                {responses.map((response) => (
+                  <div key={response.statusCode} className="response-item">
+                    <div className="response-status">
+                      <span className={`status-code ${response.statusCode.startsWith('2') ? 'success' : ''}`}>
+                        {response.statusCode}
+                      </span>
+                      <span className="response-desc">{response.description}</span>
+                    </div>
+                    {response.schema && (
+                      <div className="response-schema">
+                        {renderSchemaProperties(response.schema)}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Right: Try It Out & Code Examples */}
+        <div className="try-panel">
+          {/* Language Tabs */}
+          <div className="lang-tabs">
+            {['curl', 'nodejs', 'python', 'java'].map(lang => (
+              <button
+                key={lang}
+                className={`lang-tab ${activeLang === lang ? 'active' : ''}`}
+                onClick={() => setActiveLang(lang)}
+              >
+                {lang}
+              </button>
+            ))}
+          </div>
+
+          {/* Code Example */}
+          <div className="code-section">
+            <div className="code-header">
+              <span className="code-label">&gt; {activeLang}</span>
+              <button className="copy-btn">copy</button>
+            </div>
+            <div className="code-box">
+              <pre className="code-block">{codeExamples[activeLang]}</pre>
+            </div>
+          </div>
+
+          {/* Parameters Input */}
+          {Object.keys(groupedParams).length > 0 && (
+            <div className="params-input-section">
+              <div className="section-header">
+                <span className="section-title">parameters</span>
+              </div>
+              <div className="params-input-list">
+                {Object.entries(groupedParams).map(([paramType, params]) => (
+                  <React.Fragment key={paramType}>
+                    <div className="param-input-type-header">{paramType}</div>
+                    {params.map((param, idx) => (
+                      <div key={idx} className="param-input-row">
+                        <label className="param-input-label">
+                          {param.name}
+                          {param.required && <span className="required">*</span>}
+                        </label>
+                        <input
+                          type="text"
+                          className="param-input"
+                          placeholder={param.description || ''}
+                          value={paramValues[`${paramType}_${param.name}`] || ''}
+                          onChange={(e) => handleParamChange(paramType, param.name, e.target.value)}
+                        />
+                      </div>
+                    ))}
+                  </React.Fragment>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Request Body Input */}
+          {requestBodySchema && (
+            <div className="body-input-section">
+              <div className="section-header">
+                <span className="section-title">request body</span>
+              </div>
+              <textarea
+                className="body-input"
+                value={requestBody}
+                onChange={(e) => setRequestBody(e.target.value)}
+              />
+            </div>
+          )}
+
+          {/* Send Button */}
+          <button className="send-btn" onClick={handleSendRequest} disabled={loading}>
+            <svg className="send-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+            {loading ? 'sending...' : 'send request'}
+          </button>
+
+          {/* Response */}
+          {responseData && (
+            <div className="response-display">
+              <div className="response-display-header">
+                <span className="response-label">&gt; response</span>
+                {responseData.error ? (
+                  <span className="status-badge error">Error</span>
+                ) : (
+                  <span className={`status-badge ${responseData.status >= 200 && responseData.status < 300 ? 'success' : ''}`}>
+                    {responseData.status} {responseData.statusText}
+                  </span>
+                )}
+              </div>
+              <div className="response-display-box">
+                <pre className="code-block">
+                  {responseData.error
+                    ? responseData.message
+                    : formatJson(responseData.data)}
+                </pre>
+              </div>
+            </div>
           )}
         </div>
       </div>

@@ -197,8 +197,6 @@ function App() {
         endpoints={endpoints}
         selectedEndpoint={selectedEndpoint}
         onSelectEndpoint={setSelectedEndpoint}
-        theme={theme}
-        onToggleTheme={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
         apiInfo={apiData?.info}
         width={sidebarWidth}
       />
@@ -210,6 +208,8 @@ function App() {
         endpoint={selectedEndpoint}
         operation={getSelectedOperation()}
         apiData={apiData}
+        theme={theme}
+        onToggleTheme={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
       />
     </div>
   )
