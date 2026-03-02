@@ -46,8 +46,10 @@ function App() {
       let apiDocsUrl
 
       const urlParams = new URLSearchParams(window.location.search)
-      const apiPath = urlParams.get('apiPath') || '/v3/api-docs'
-      const baseUrl = urlParams.get('baseUrl')
+      // 参数优先级：URL 参数 > SWAGGER_UI_CONFIG > 默认值
+      const swaggerConfig = window.SWAGGER_UI_CONFIG || {}
+      const apiPath = urlParams.get('apiPath') || swaggerConfig.apiPath || '/v3/api-docs'
+      const baseUrl = urlParams.get('baseUrl') || swaggerConfig.baseUrl
 
       if (baseUrl) {
         if (baseUrl.startsWith('http')) {
