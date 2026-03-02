@@ -358,10 +358,6 @@
 .method-badge.patch { background-color: var(--accent-warning); }
 .method-badge.delete { background-color: var(--accent-error); }
 
-[data-theme="light"] .method-badge {
-  color: #FFFFFF;
-}
-
 .endpoint-path {
   font-size: 20px;
   font-weight: 600;
@@ -633,10 +629,6 @@
   cursor: not-allowed;
 }
 
-[data-theme="light"] .send-btn {
-  color: #FFFFFF;
-}
-
 /* Response Display */
 .response-display {
   display: flex;
@@ -842,10 +834,6 @@
   font-size: 12px;
   font-weight: 600;
   color: #0C0C0C;
-}
-
-[data-theme="light"] .try-button {
-  color: #FFFFFF;
 }
 
 /* Request Section */
