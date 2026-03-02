@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react'
 
-function MainContent({ endpoint, operation, apiData, theme, onToggleTheme }) {
+function MainContent({ endpoint, operation, apiData, theme, onToggleTheme, authToken, onOpenSettings }) {
   const [activeLang, setActiveLang] = useState('curl')
   const [requestBody, setRequestBody] = useState('')
   const [responseData, setResponseData] = useState(null)
@@ -161,7 +161,9 @@ function MainContent({ endpoint, operation, apiData, theme, onToggleTheme }) {
     const requestHeaders = {
       'Content-Type': 'application/json',
     }
-    if (op?.security) {
+    if (authToken) {
+      requestHeaders['Authorization'] = `Bearer ${authToken}`
+    } else if (op?.security) {
       requestHeaders['Authorization'] = 'Bearer <your_token>'
     }
 
@@ -251,7 +253,7 @@ print(response.status_code)
 print(response.json())`
 
     return { curl, java, nodejs, python }
-  }, [method, path, requestBody, paramValues, groupedParams, apiData, requestBodySchema, op?.security])
+  }, [method, path, requestBody, paramValues, groupedParams, apiData, requestBodySchema, op?.security, authToken])
 
   const handleParamChange = (paramType, paramName, value) => {
     setParamValues(prev => ({
@@ -282,6 +284,9 @@ print(response.json())`
 
       const headers = {
         'Content-Type': 'application/json',
+      }
+      if (authToken) {
+        headers['Authorization'] = `Bearer ${authToken}`
       }
 
       const options = {
@@ -447,7 +452,7 @@ print(response.json())`
               </svg>
             )}
           </button>
-          <button className="toolbar-btn settings-btn" aria-label="Settings">
+          <button className="toolbar-btn settings-btn" onClick={onOpenSettings} aria-label="Settings">
             <svg className="toolbar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <circle cx="12" cy="12" r="3"></circle>
               <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0-1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
@@ -483,7 +488,7 @@ print(response.json())`
             </svg>
           )}
         </button>
-        <button className="toolbar-btn settings-btn" aria-label="Settings">
+        <button className="toolbar-btn settings-btn" onClick={onOpenSettings} aria-label="Settings">
           <svg className="toolbar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <circle cx="12" cy="12" r="3"></circle>
             <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0-1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>

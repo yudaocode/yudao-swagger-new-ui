@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import './App.css'
 import Sidebar from './components/Sidebar'
 import MainContent from './components/MainContent'
+import SettingsModal from './components/SettingsModal'
 
 function App() {
   const [selectedEndpoint, setSelectedEndpoint] = useState(null)
@@ -15,6 +16,10 @@ function App() {
     return parseInt(localStorage.getItem('sidebarWidth')) || 280
   })
   const [isDragging, setIsDragging] = useState(false)
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false)
+  const [authToken, setAuthToken] = useState(() => {
+    return localStorage.getItem('authToken') || ''
+  })
   const dragStartX = useRef(0)
   const dragStartWidth = useRef(0)
 
@@ -26,6 +31,10 @@ function App() {
     }
     localStorage.setItem('theme', theme)
   }, [theme])
+
+  useEffect(() => {
+    localStorage.setItem('authToken', authToken)
+  }, [authToken])
 
   useEffect(() => {
     fetchApiData()
@@ -210,6 +219,14 @@ function App() {
         apiData={apiData}
         theme={theme}
         onToggleTheme={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+        authToken={authToken}
+        onOpenSettings={() => setIsSettingsOpen(true)}
+      />
+      <SettingsModal
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+        token={authToken}
+        onSaveToken={setAuthToken}
       />
     </div>
   )
