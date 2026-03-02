@@ -1,0 +1,12 @@
+@use 'themes';
+@use 'base';
+@use 'sidebar';
+@use 'content';
+@use 'params';
+@use 'try';
+
+.app {
+  display: flex;
+  height: 100vh;
+  background-color: var(--page-bg);
+}
