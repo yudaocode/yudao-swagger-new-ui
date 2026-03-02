@@ -1,0 +1,146 @@
+.sidebar {
+  width: 280px;
+  background-color: var(--page-bg);
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  border-right: 1px solid var(--border-primary);
+}
+
+.sidebar-header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.logo-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logo-icon {
+  width: 24px;
+  height: 24px;
+  color: var(--accent-green);
+}
+
+.logo-text {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.subtitle {
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+.search-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.search-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  height: 36px;
+  background-color: var(--surface-bg);
+  border-radius: var(--radius-sm);
+}
+
+.search-icon {
+  width: 16px;
+  height: 16px;
+  color: var(--text-muted);
+}
+
+.search-input {
+  font-size: 13px;
+  color: var(--text-tertiary);
+  background: transparent;
+  border: none;
+  outline: none;
+  flex: 1;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.nav-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.nav-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.nav-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  & + .nav-group {
+    padding-top: 12px;
+  }
+}
+
+.group-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  padding: 4px 0;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px;
+  height: 32px;
+  background-color: var(--input-bg);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background-color 0.15s;
+
+  &:hover {
+    background-color: var(--border-primary);
+  }
+
+  &.active {
+    background-color: var(--input-bg);
+  }
+
+  .method {
+    font-size: 11px;
+    font-weight: 600;
+
+    &.get { color: var(--accent-green); }
+    &.post { color: var(--accent-info); }
+    &.put { color: var(--accent-warning); }
+    &.delete { color: var(--accent-error); }
+  }
+
+  .path {
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+
+  &.active .path {
+    color: var(--text-primary);
+  }
+}

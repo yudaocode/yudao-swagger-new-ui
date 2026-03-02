@@ -1,0 +1,57 @@
+.params-section {
+  background-color: var(--surface-bg);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.params-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.params-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.toggle-icon {
+  width: 16px;
+  height: 16px;
+  color: var(--text-muted);
+}
+
+.params-table {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.param-row {
+  display: flex;
+  gap: 12px;
+  padding: 8px 0;
+}
+
+.param-name {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--accent-info);
+  min-width: 100px;
+}
+
+.param-type {
+  font-size: 11px;
+  color: var(--text-muted);
+  min-width: 80px;
+}
+
+.param-desc {
+  font-size: 12px;
+  color: var(--text-secondary);
+  flex: 1;
+}

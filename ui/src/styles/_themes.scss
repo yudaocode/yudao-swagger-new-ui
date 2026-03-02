@@ -1,0 +1,46 @@
+@use 'variables' as *;
+
+@mixin dark-theme {
+  --page-bg: #{$dark-page-bg};
+  --surface-bg: #{$dark-surface-bg};
+  --input-bg: #{$dark-input-bg};
+  --text-primary: #{$dark-text-primary};
+  --text-secondary: #{$dark-text-secondary};
+  --text-tertiary: #{$dark-text-tertiary};
+  --text-muted: #{$dark-text-muted};
+  --border-primary: #{$dark-border-primary};
+  --border-secondary: #{$dark-border-secondary};
+  --accent-green: #{$accent-green};
+  --accent-info: #{$accent-info};
+  --accent-warning: #{$accent-warning};
+  --accent-error: #{$accent-error};
+}
+
+@mixin light-theme {
+  --page-bg: #{$light-page-bg};
+  --surface-bg: #{$light-surface-bg};
+  --input-bg: #{$light-input-bg};
+  --text-primary: #{$light-text-primary};
+  --text-secondary: #{$light-text-secondary};
+  --text-tertiary: #{$light-text-tertiary};
+  --text-muted: #{$light-text-muted};
+  --border-primary: #{$light-border-primary};
+  --border-secondary: #{$light-border-secondary};
+  --accent-green: #{$light-accent-green};
+  --accent-info: #{$light-accent-info};
+  --accent-warning: #{$light-accent-warning};
+  --accent-error: #{$light-accent-error};
+}
+
+:root {
+  @include dark-theme;
+
+  --radius-sm: #{$radius-sm};
+  --spacing-sm: #{$spacing-sm};
+  --spacing-md: #{$spacing-md};
+  --spacing-lg: #{$spacing-lg};
+}
+
+[data-theme="light"] {
+  @include light-theme;
+}
