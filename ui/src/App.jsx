@@ -43,7 +43,33 @@ function App() {
   const fetchApiData = async () => {
     try {
       setLoading(true)
-      const response = await fetch('/v3/api-docs', {
+      let apiDocsUrl
+
+      const urlParams = new URLSearchParams(window.location.search)
+      const apiPath = urlParams.get('apiPath') || '/v3/api-docs'
+      const baseUrl = urlParams.get('baseUrl')
+
+      if (baseUrl) {
+        if (baseUrl.startsWith('http')) {
+          // baseUrl is a full URL like http://localhost:8080
+          // apiPath is like /v3/api-docs
+          apiDocsUrl = new URL(apiPath, baseUrl).href
+        } else if (baseUrl.startsWith('/')) {
+          // baseUrl is a path prefix like /admin
+          // Combine: /admin + /v3/api-docs -> /admin/v3/api-docs
+          apiDocsUrl = baseUrl.replace(/\/$/, '') + apiPath
+        } else {
+          // Use relative path
+          apiDocsUrl = apiPath
+        }
+      } else {
+        // Use relative path (will be handled by Vite proxy in development)
+        apiDocsUrl = apiPath
+      }
+
+      console.log('Fetching API docs from:', apiDocsUrl)
+
+      const response = await fetch(apiDocsUrl, {
         headers: {
           'Accept': 'application/json,*/*',
         },
