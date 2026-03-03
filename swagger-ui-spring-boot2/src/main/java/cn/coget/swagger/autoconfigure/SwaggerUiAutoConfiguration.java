@@ -66,28 +66,38 @@ public class SwaggerUiAutoConfiguration implements WebMvcConfigurer {
 
     /**
      * 配置动态 HTML 路由，支持注入动态信息到 HTML 页面
+     * 支持多个路径（逗号分割）
      */
     @Bean
     public RouterFunction<ServerResponse> swaggerUiHtmlRouter() {
-        return route(GET(properties.getHtmlPath()), request -> {
-            try {
-                // 读取静态 HTML 模板
-                ClassPathResource htmlResource = new ClassPathResource("static/index.html");
-                String htmlContent = StreamUtils.copyToString(
-                        htmlResource.getInputStream(), 
-                        StandardCharsets.UTF_8
-                );
-                
-                // 注入动态信息
-                htmlContent = injectDynamicInfo(htmlContent, request);
-                
-                return ServerResponse.ok()
-                        .contentType(org.springframework.http.MediaType.TEXT_HTML)
-                        .body(htmlContent);
-            } catch (IOException e) {
-                return ServerResponse.notFound().build();
+        RouterFunction<ServerResponse> router = null;
+        for (String htmlPath : properties.getPathList()) {
+            RouterFunction<ServerResponse> pathRouter = route(GET(htmlPath), request -> {
+                try {
+                    // 读取静态 HTML 模板
+                    ClassPathResource htmlResource = new ClassPathResource("static/index.html");
+                    String htmlContent = StreamUtils.copyToString(
+                            htmlResource.getInputStream(), 
+                            StandardCharsets.UTF_8
+                    );
+                    
+                    // 注入动态信息
+                    htmlContent = injectDynamicInfo(htmlContent, request);
+                    
+                    return ServerResponse.ok()
+                            .contentType(org.springframework.http.MediaType.TEXT_HTML)
+                            .body(htmlContent);
+                } catch (IOException e) {
+                    return ServerResponse.notFound().build();
+                }
+            });
+            if (router == null) {
+                router = pathRouter;
+            } else {
+                router = router.and(pathRouter);
             }
-        });
+        }
+        return router;
     }
     
     /**

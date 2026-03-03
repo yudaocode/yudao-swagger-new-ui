@@ -1,17 +1,21 @@
 package cn.coget.swagger.autoconfigure;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.util.StringUtils;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @ConfigurationProperties(prefix = "swagger-new-ui")
 public class SwaggerUiProperties {
 
     /**
-     * Swagger UI HTML 页面路径
+     * Swagger UI 访问路径，支持多个路径（逗号分割）
      */
-    private String htmlPath = "/swagger-new-ui.html";
+    private String paths = "/swagger-new-ui.html";
 
     /**
      * 分组 API 路径
@@ -34,12 +38,28 @@ public class SwaggerUiProperties {
      */
     private Map<String, Object> injectConfig = new HashMap<>();
 
-    public String getHtmlPath() {
-        return htmlPath;
+    public String getPaths() {
+        return paths;
     }
 
-    public void setHtmlPath(String htmlPath) {
-        this.htmlPath = htmlPath;
+    /**
+     * 获取所有访问路径列表
+     * 支持逗号分割的多个路径
+     *
+     * @return 访问路径列表
+     */
+    public List<String> getPathList() {
+        if (!StringUtils.hasText(paths)) {
+            return Arrays.asList("/swagger-new-ui.html");
+        }
+        return Arrays.stream(paths.split(","))
+                .map(String::trim)
+                .filter(StringUtils::hasText)
+                .collect(Collectors.toList());
+    }
+
+    public void setPaths(String paths) {
+        this.paths = paths;
     }
 
     public String getGroupsApiPath() {

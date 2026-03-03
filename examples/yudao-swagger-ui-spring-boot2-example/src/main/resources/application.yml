@@ -9,4 +9,5 @@ spring:
     name: swagger-ui-example
 
 swagger-new-ui:
+  paths: swagger-new-ui.html,swagger-ui.html,doc.html
   base-url: ${server.servlet.context-path}

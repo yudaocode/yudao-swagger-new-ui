@@ -28,7 +28,7 @@
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-webmvc-core</artifactId>
             <version>${springdoc-boot2.version}</version>
-            <scope>provided</scope>
+<!--            <scope>provided</scope>-->
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
