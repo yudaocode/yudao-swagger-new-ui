@@ -990,7 +990,7 @@
 .param-row {
   display: flex;
   gap: 12px;
-  padding: 8px 0;
+  padding: 4px 0;
 }
 
 .param-col-left {
@@ -1107,6 +1107,17 @@
 /* 5xx 服务器错误 */
 .status-code.server-error {
   color: var(--accent-error);
+}
+
+/* 空响应提示 */
+.response-empty {
+  padding: 12px 0;
+}
+
+.response-empty-text {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-style: italic;
 }
 
 .response-desc {

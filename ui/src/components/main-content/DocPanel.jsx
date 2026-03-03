@@ -174,9 +174,15 @@ function DocPanel({
                   className={`toggle-icon ${collapsedSections[`response_${response.statusCode}`] ? 'collapsed' : ''}`}
                 />
               </div>
-              {response.schema && !collapsedSections[`response_${response.statusCode}`] && (
+              {!collapsedSections[`response_${response.statusCode}`] && (
                 <div className="params-table">
-                  <SchemaViewer schema={response.schema} />
+                  {response.schema ? (
+                    <SchemaViewer schema={response.schema} />
+                  ) : (
+                    <div className="response-empty">
+                      <span className="response-empty-text">No content</span>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
