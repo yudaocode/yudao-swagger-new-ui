@@ -6,6 +6,10 @@ function MainContent({ endpoint, operation, apiData, theme, onToggleTheme, authT
   const [responseData, setResponseData] = useState(null)
   const [loading, setLoading] = useState(false)
   const [paramValues, setParamValues] = useState({})
+  const [collapsedSections, setCollapsedSections] = useState({
+    parameters: false,
+    requestBody: false,
+  })
 
   const resolveRef = useMemo(() => {
     const schemas = apiData?.components?.schemas || {}
@@ -135,6 +139,21 @@ function MainContent({ endpoint, operation, apiData, theme, onToggleTheme, authT
       return acc
     }, {})
   }, [parameters])
+
+  const handleToggleSection = (sectionKey) => {
+    setCollapsedSections(prev => ({
+      ...prev,
+      [sectionKey]: !prev[sectionKey]
+    }))
+  }
+
+  const handleCopyCode = async () => {
+    try {
+      await navigator.clipboard.writeText(codeExamples[activeLang])
+    } catch (err) {
+      console.error('Failed to copy:', err)
+    }
+  }
 
   const getBaseUrl = () => {
     const servers = apiData?.servers || []
@@ -338,6 +357,13 @@ print(response.json())`
       const items = schema.items
       const hasNestedProperties = items.properties || items.$ref
 
+      // 如果有 prefix，渲染 array 行；否则直接渲染子元素
+      // 这样避免当 array 是嵌套属性时重复渲染
+      if (!prefix) {
+        // 没有 prefix，说明是从父级递归进来的，直接渲染子元素
+        return hasNestedProperties ? renderSchemaProperties(items, '', level) : null
+      }
+
       return (
         <React.Fragment key={`${prefix}-array`}>
           <div className="param-row" style={{ paddingLeft: `${level * 16}px` }}>
@@ -349,7 +375,7 @@ print(response.json())`
               <span className="param-desc">{schema.description || ''}</span>
             </div>
           </div>
-          {hasNestedProperties && renderSchemaProperties(items, `${prefix}[]`, level + 1)}
+          {hasNestedProperties && renderSchemaProperties(items, '', level + 1)}
         </React.Fragment>
       )
     }
@@ -371,8 +397,13 @@ print(response.json())`
         )
       }
 
+      // 子属性应该始终比父级缩进一级
+      // 无论 prefix 是否存在，子属性都在 level + 1 级
+      const childLevel = level + 1
+
       Object.entries(schema.properties).forEach(([key, prop]) => {
-        const fullKey = prefix ? `${prefix}.${key}` : key
+        // 显示名称：如果有 prefix 就显示 prefix.key，否则只显示 key
+        const displayName = prefix ? `${prefix}.${key}` : key
         const required = schema.required?.includes(key)
 
         const hasNestedContent = (prop.type === 'object' && prop.properties) ||
@@ -380,12 +411,14 @@ print(response.json())`
                                  prop.$ref
 
         if (hasNestedContent) {
+          // 对于嵌套的 object/array 类型，渲染当前属性行，然后递归渲染子属性
+          // 递归时传入空 prefix，让子属性直接显示 key
           elements.push(
-            <React.Fragment key={fullKey}>
-              <div className="param-row" style={{ paddingLeft: `${(prefix ? level + 1 : level) * 16}px` }}>
+            <React.Fragment key={displayName}>
+              <div className="param-row" style={{ paddingLeft: `${childLevel * 16}px` }}>
                 <div className="param-col-left">
                   <span className="param-name">
-                    {fullKey}
+                    {displayName}
                     {required && <span className="required">*</span>}
                   </span>
                   <span className="param-type">
@@ -398,15 +431,16 @@ print(response.json())`
                   {required && <span className="param-meta">required</span>}
                 </div>
               </div>
-              {renderSchemaProperties(prop, fullKey, prefix ? level + 1 : level)}
+              {/* 递归渲染子属性，传入空 prefix 和 childLevel */}
+              {renderSchemaProperties(prop, '', childLevel)}
             </React.Fragment>
           )
         } else {
           elements.push(
-            <div key={fullKey} className="param-row" style={{ paddingLeft: `${(prefix ? level + 1 : level) * 16}px` }}>
+            <div key={displayName} className="param-row" style={{ paddingLeft: `${childLevel * 16}px` }}>
               <div className="param-col-left">
                 <span className="param-name">
-                  {fullKey}
+                  {displayName}
                   {required && <span className="required">*</span>}
                 </span>
                 <span className="param-type">
@@ -519,79 +553,81 @@ print(response.json())`
         <div className="doc-panel">
           {Object.keys(groupedParams).length > 0 && (
             <div className="params-section">
-              <div className="params-header">
+              <div className="params-header" onClick={() => handleToggleSection('parameters')} style={{ cursor: 'pointer' }}>
                 <span className="params-title">parameters</span>
-                <svg className="toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg className={`toggle-icon ${collapsedSections.parameters ? 'collapsed' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <polyline points="6 9 12 15 18 9"></polyline>
                 </svg>
               </div>
-              <div className="params-table">
-                {Object.entries(groupedParams).map(([paramType, params]) => (
-                  <React.Fragment key={paramType}>
-                    <div className="param-type-header">{paramType}</div>
-                    {params.map((param, idx) => (
-                      <div key={idx} className="param-row">
-                        <div className="param-col-left">
-                          <span className="param-name">
-                            {param.name}
-                            {param.required && <span className="required">*</span>}
-                          </span>
-                          <span className="param-type">{param.schema?.type || 'string'}</span>
+              {!collapsedSections.parameters && (
+                <div className="params-table">
+                  {Object.entries(groupedParams).map(([paramType, params]) => (
+                    <React.Fragment key={paramType}>
+                      <div className="param-type-header">{paramType}</div>
+                      {params.map((param, idx) => (
+                        <div key={idx} className="param-row">
+                          <div className="param-col-left">
+                            <span className="param-name">
+                              {param.name}
+                              {param.required && <span className="required">*</span>}
+                            </span>
+                            <span className="param-type">{param.schema?.type || 'string'}</span>
+                          </div>
+                          <div className="param-col-right">
+                            <span className="param-desc">{param.description || ''}</span>
+                            {param.required && <span className="param-meta">required</span>}
+                          </div>
                         </div>
-                        <div className="param-col-right">
-                          <span className="param-desc">{param.description || ''}</span>
-                          {param.required && <span className="param-meta">required</span>}
-                        </div>
-                      </div>
-                    ))}
-                  </React.Fragment>
-                ))}
-              </div>
+                      ))}
+                    </React.Fragment>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
           {requestBodySchema && (
             <div className="params-section">
-              <div className="params-header">
+              <div className="params-header" onClick={() => handleToggleSection('requestBody')} style={{ cursor: 'pointer' }}>
                 <span className="params-title">request body</span>
-                <svg className="toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg className={`toggle-icon ${collapsedSections.requestBody ? 'collapsed' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <polyline points="6 9 12 15 18 9"></polyline>
                 </svg>
               </div>
-              {op.requestBody?.description && (
-                <p className="section-desc">{op.requestBody.description}</p>
+              {!collapsedSections.requestBody && (
+                <>
+                  {op.requestBody?.description && (
+                    <p className="section-desc">{op.requestBody.description}</p>
+                  )}
+                  <div className="params-table">
+                    {renderSchemaProperties(requestBodySchema)}
+                  </div>
+                </>
               )}
-              <div className="params-table">
-                {renderSchemaProperties(requestBodySchema)}
-              </div>
             </div>
           )}
 
           {responses.length > 0 && (
             <div className="params-section">
-              <div className="params-header">
-                <span className="params-title">responses</span>
-                <svg className="toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <polyline points="6 9 12 15 18 9"></polyline>
-                </svg>
-              </div>
-              <div className="responses-list">
-                {responses.map((response) => (
-                  <div key={response.statusCode} className="response-item">
-                    <div className="response-status">
-                      <span className={`status-code ${response.statusCode.startsWith('2') ? 'success' : ''}`}>
-                        {response.statusCode}
-                      </span>
-                      <span className="response-desc">{response.description}</span>
-                    </div>
-                    {response.schema && (
-                      <div className="response-schema">
-                        {renderSchemaProperties(response.schema)}
-                      </div>
-                    )}
+              {responses.map((response) => (
+                <div key={response.statusCode}>
+                  <div className="params-header" onClick={() => handleToggleSection(`response_${response.statusCode}`)} style={{ cursor: 'pointer' }}>
+                    <span className="params-title">responses</span>
+                    <span className={`status-code ${response.statusCode.startsWith('2') ? 'success' : ''}`}>
+                      {response.statusCode}
+                    </span>
+                    <span className="response-desc">{response.description}</span>
+                    <svg className={`toggle-icon ${collapsedSections[`response_${response.statusCode}`] ? 'collapsed' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
                   </div>
-                ))}
-              </div>
+                  {response.schema && !collapsedSections[`response_${response.statusCode}`] && (
+                    <div className="params-table">
+                      {renderSchemaProperties(response.schema)}
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
           )}
         </div>

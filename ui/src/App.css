@@ -670,6 +670,11 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
+}
+
+.params-header .status-code {
+  margin-left: auto;
 }
 
 .params-title {
@@ -682,6 +687,11 @@
   width: 16px;
   height: 16px;
   color: var(--text-muted);
+  transition: transform 0.2s ease;
+}
+
+.toggle-icon.collapsed {
+  transform: rotate(-90deg);
 }
 
 .params-table {
