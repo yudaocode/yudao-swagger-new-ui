@@ -17,7 +17,8 @@ public class UserController {
 
     @Operation(summary = "获取用户列表")
     @GetMapping
-    public Result<List<UserVO>> getUsers(UserQueryDTO query) {
+    public Result<List<UserVO>> getUsers(UserQueryDTO query) throws InterruptedException {
+        Thread.sleep(1000);
         List<UserVO> users = new ArrayList<>();
         UserVO user = new UserVO();
         user.setId(1L);
