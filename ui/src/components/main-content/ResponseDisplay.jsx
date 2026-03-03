@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useMemo } from 'react'
 import hljs from 'highlight.js/lib/core'
 import json from 'highlight.js/lib/languages/json'
 
@@ -6,50 +6,67 @@ hljs.registerLanguage('json', json)
 
 /**
  * 响应结果展示组件
+ * 始终渲染占位，避免布局抖动
  */
 function ResponseDisplay({ responseData, onCopy, copySuccess }) {
   const codeRef = useRef(null)
 
-  const formatJson = (obj) => {
-    return JSON.stringify(obj, null, 2)
-  }
+  // Memoize formatted JSON to avoid recalculation
+  const formattedJson = useMemo(() => {
+    if (!responseData || responseData.error) return null
+    return JSON.stringify(responseData.data, null, 2)
+  }, [responseData])
 
-  // Apply syntax highlighting when response data changes
+  // Apply syntax highlighting when response changes
   useEffect(() => {
-    if (codeRef.current && responseData && !responseData.error) {
-      const jsonStr = formatJson(responseData.data)
-      codeRef.current.textContent = jsonStr
+    if (codeRef.current && formattedJson) {
+      codeRef.current.textContent = formattedJson
       codeRef.current.removeAttribute('data-highlighted')
       codeRef.current.className = 'language-json'
       hljs.highlightElement(codeRef.current)
     }
-  }, [responseData])
+  }, [formattedJson])
 
-  if (!responseData) return null
-
+  // Always render the container to prevent layout shift
   return (
     <div className="response-display">
       <div className="response-display-header">
         <div className="response-info">
           <span className="response-label">&gt; response</span>
-          {responseData.error ? (
-            <span className="status-badge error">Error</span>
+          {responseData ? (
+            responseData.error ? (
+              <span className="status-badge error">Error</span>
+            ) : (
+              <span className={`status-badge ${responseData.status >= 200 && responseData.status < 300 ? 'success' : ''}`}>
+                {responseData.status} {responseData.statusText}
+              </span>
+            )
           ) : (
-            <span className={`status-badge ${responseData.status >= 200 && responseData.status < 300 ? 'success' : ''}`}>
-              {responseData.status} {responseData.statusText}
-            </span>
+            <span className="status-badge">waiting</span>
           )}
         </div>
-        <button className="copy-btn" onClick={onCopy}>
+        {/* Always render copy button to prevent layout shift */}
+        <button
+          className="copy-btn"
+          onClick={onCopy}
+          disabled={!responseData}
+          style={{ visibility: responseData ? 'visible' : 'hidden' }}
+        >
           {copySuccess ? 'copied!' : 'copy'}
         </button>
       </div>
       <div className="response-display-box">
         <pre className="code-block">
-          {responseData.error ? (
-            responseData.message
+          {responseData ? (
+            responseData.error ? (
+              responseData.message
+            ) : (
+              <code ref={codeRef} className="language-json">
+                {formattedJson}
+              </code>
+            )
           ) : (
-            <code ref={codeRef} className="language-json"></code>
+            <span className="response-placeholder">Click "send request" to see the response</span>
           )}
         </pre>
       </div>

@@ -1,5 +1,8 @@
 import { useState, useCallback } from 'react'
 
+// Minimum loading time in milliseconds for better UX
+const MIN_LOADING_TIME = 300
+
 /**
  * API 请求 Hook
  * @param {Object} options - 配置选项
@@ -26,6 +29,8 @@ export function useApiRequest({ authToken } = {}) {
   }) => {
     setLoading(true)
     setResponseData(null)
+
+    const startTime = Date.now()
 
     try {
       let fullPath = path.replace(/\{(\w+)\}/g, (_, key) => {
@@ -79,18 +84,20 @@ export function useApiRequest({ authToken } = {}) {
       const response = await fetch(requestUrl + queryString, options)
       const data = await response.json()
 
+      const result = {
+        success: true,
+        status: response.status,
+        statusText: response.statusText,
+        data,
+      }
+
       setResponseData({
         status: response.status,
         statusText: response.statusText,
         data,
       })
 
-      return {
-        success: true,
-        status: response.status,
-        statusText: response.statusText,
-        data,
-      }
+      return result
     } catch (error) {
       const errorResult = {
         error: true,
@@ -99,6 +106,14 @@ export function useApiRequest({ authToken } = {}) {
       setResponseData(errorResult)
       return errorResult
     } finally {
+      // Ensure minimum loading time for better UX
+      const elapsed = Date.now() - startTime
+      const remainingTime = MIN_LOADING_TIME - elapsed
+
+      if (remainingTime > 0) {
+        await new Promise(resolve => setTimeout(resolve, remainingTime))
+      }
+
       setLoading(false)
     }
   }, [authToken, getConfigBaseUrl])

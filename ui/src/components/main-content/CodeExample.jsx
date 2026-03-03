@@ -10,6 +10,13 @@ hljs.registerLanguage('javascript', javascript)
 hljs.registerLanguage('python', python)
 hljs.registerLanguage('java', java)
 
+const langMap = {
+  curl: 'bash',
+  nodejs: 'javascript',
+  python: 'python',
+  java: 'java',
+}
+
 /**
  * 代码示例组件
  * 支持多语言切换、语法高亮和复制功能
@@ -23,22 +30,17 @@ function CodeExample({
 }) {
   const codeRef = useRef(null)
 
-  const langMap = {
-    curl: 'bash',
-    nodejs: 'javascript',
-    python: 'python',
-    java: 'java',
-  }
+  // Get current code
+  const currentCode = codeExamples[activeLang] || ''
 
-  // Apply syntax highlighting when code changes
+  // Apply syntax highlighting after render
   useEffect(() => {
-    if (codeRef.current && codeExamples[activeLang]) {
-      codeRef.current.textContent = codeExamples[activeLang]
+    if (codeRef.current && currentCode) {
       codeRef.current.removeAttribute('data-highlighted')
       codeRef.current.className = `language-${langMap[activeLang]}`
       hljs.highlightElement(codeRef.current)
     }
-  }, [activeLang, codeExamples])
+  }, [activeLang, currentCode])
 
   return (
     <div className="code-section">
@@ -67,7 +69,9 @@ function CodeExample({
           <code
             ref={codeRef}
             className={`language-${langMap[activeLang]}`}
-          ></code>
+          >
+            {currentCode}
+          </code>
         </pre>
       </div>
     </div>
