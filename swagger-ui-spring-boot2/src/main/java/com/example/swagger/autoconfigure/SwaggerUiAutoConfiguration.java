@@ -2,6 +2,9 @@ package com.example.swagger.autoconfigure;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springdoc.core.GroupedOpenApi;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -15,7 +18,9 @@ import org.springframework.web.servlet.function.ServerResponse;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.springframework.web.servlet.function.RequestPredicates.GET;
@@ -36,10 +41,27 @@ public class SwaggerUiAutoConfiguration implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler(properties.getWebMvcUrlMapping() + "/**")
+        // 静态资源路径从 groupsApiPath 中提取
+        String staticPath = extractStaticPath(properties.getGroupsApiPath());
+        registry.addResourceHandler(staticPath + "/**")
                 .addResourceLocations("classpath:/static/")
                 .setCachePeriod(0)
                 .resourceChain(true);
+    }
+
+    /**
+     * 从 groupsApiPath 中提取静态资源路径
+     * 例如: "/swagger-new-ui/groups" -> "/swagger-new-ui"
+     */
+    private String extractStaticPath(String groupsApiPath) {
+        if (groupsApiPath == null || groupsApiPath.isEmpty()) {
+            return "/swagger-new-ui";
+        }
+        int lastSlash = groupsApiPath.lastIndexOf('/');
+        if (lastSlash > 0) {
+            return groupsApiPath.substring(0, lastSlash);
+        }
+        return groupsApiPath;
     }
 
     /**
@@ -47,7 +69,7 @@ public class SwaggerUiAutoConfiguration implements WebMvcConfigurer {
      */
     @Bean
     public RouterFunction<ServerResponse> swaggerUiHtmlRouter() {
-        return route(GET("/swagger-ui.html"), request -> {
+        return route(GET("/swagger-new-ui.html"), request -> {
             try {
                 // 读取静态 HTML 模板
                 ClassPathResource htmlResource = new ClassPathResource("static/index.html");
@@ -81,6 +103,7 @@ public class SwaggerUiAutoConfiguration implements WebMvcConfigurer {
         config.put("path", request.path());
         config.put("baseUrl", properties.getBaseUrl());
         config.put("apiPath", properties.getApiPath());
+        config.put("groupsPath", properties.getGroupsApiPath());
         
         // 合并用户自定义配置
         if (properties.getInjectConfig() != null && !properties.getInjectConfig().isEmpty()) {
@@ -103,5 +126,49 @@ public class SwaggerUiAutoConfiguration implements WebMvcConfigurer {
         
         // 在 <head> 标签后注入脚本
         return htmlContent.replace("<head>", "<head>\n" + scriptBuilder.toString());
+    }
+
+    /**
+     * 配置 Swagger 分组信息路由
+     * 仅在 springdoc 存在时才生效
+     */
+    @Bean
+    @ConditionalOnClass(GroupedOpenApi.class)
+    public RouterFunction<ServerResponse> swaggerGroupsRouter(
+            @Autowired(required = false) List<GroupedOpenApi> groupedOpenApis) {
+        String groupsPath = properties.getGroupsApiPath();
+        return route(GET(groupsPath), request -> {
+            List<Map<String, String>> groups = new ArrayList<>();
+            
+            // 添加默认分组
+            Map<String, String> defaultGroup = new HashMap<>();
+            defaultGroup.put("name", "default");
+            defaultGroup.put("displayName", "默认分组");
+            defaultGroup.put("url", properties.getApiPath());
+            groups.add(defaultGroup);
+            
+            // 添加用户定义的分组
+            if (groupedOpenApis != null) {
+                for (GroupedOpenApi groupedOpenApi : groupedOpenApis) {
+                    String group = groupedOpenApi.getGroup();
+                    Map<String, String> groupInfo = new HashMap<>();
+                    groupInfo.put("name", group);
+                    groupInfo.put("displayName", group);
+                    groupInfo.put("url", properties.getApiPath() + "/" + group);
+                    groups.add(groupInfo);
+                }
+            }
+            
+            String groupsJson;
+            try {
+                groupsJson = objectMapper.writeValueAsString(groups);
+            } catch (JsonProcessingException e) {
+                groupsJson = "[]";
+            }
+            
+            return ServerResponse.ok()
+                    .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                    .body(groupsJson);
+        });
     }
 }

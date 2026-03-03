@@ -5,13 +5,13 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import java.util.HashMap;
 import java.util.Map;
 
-@ConfigurationProperties(prefix = "swagger-ui")
+@ConfigurationProperties(prefix = "swagger-new-ui")
 public class SwaggerUiProperties {
 
     /**
-     * static 静态文件路径
+     * 分组 API 路径
      */
-    private String webMvcUrlMapping = "/swagger-ui";
+    private String groupsApiPath = "/swagger-new-ui/groups";
 
     /**
      * Swagger UI 的基础 URL 路径
@@ -29,12 +29,12 @@ public class SwaggerUiProperties {
      */
     private Map<String, Object> injectConfig = new HashMap<>();
 
-    public String getWebMvcUrlMapping() {
-        return webMvcUrlMapping;
+    public String getGroupsApiPath() {
+        return groupsApiPath;
     }
 
-    public void setWebMvcUrlMapping(String webMvcUrlMapping) {
-        this.webMvcUrlMapping = webMvcUrlMapping;
+    public void setGroupsApiPath(String groupsApiPath) {
+        this.groupsApiPath = groupsApiPath;
     }
 
     public String getBaseUrl() {
