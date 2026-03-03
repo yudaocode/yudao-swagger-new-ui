@@ -1,4 +1,14 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useEffect, useRef } from 'react'
+import hljs from 'highlight.js/lib/core'
+import bash from 'highlight.js/lib/languages/bash'
+import javascript from 'highlight.js/lib/languages/javascript'
+import python from 'highlight.js/lib/languages/python'
+import java from 'highlight.js/lib/languages/java'
+
+hljs.registerLanguage('bash', bash)
+hljs.registerLanguage('javascript', javascript)
+hljs.registerLanguage('python', python)
+hljs.registerLanguage('java', java)
 
 function MainContent({ endpoint, operation, apiData, theme, onToggleTheme, authToken, onOpenSettings }) {
   const [activeLang, setActiveLang] = useState('curl')
@@ -11,6 +21,8 @@ function MainContent({ endpoint, operation, apiData, theme, onToggleTheme, authT
     requestBody: false,
   })
   const [copySuccess, setCopySuccess] = useState(false)
+
+  const codeRef = useRef(null)
 
   const resolveRef = useMemo(() => {
     const schemas = apiData?.components?.schemas || {}
@@ -276,6 +288,17 @@ print(response.json())`
 
     return { curl, java, nodejs, python }
   }, [method, path, requestBody, paramValues, groupedParams, apiData, requestBodySchema, op?.security, authToken])
+
+  // Apply syntax highlighting when code changes
+  useEffect(() => {
+    if (codeRef.current) {
+      // Clear previous highlighting first
+      codeRef.current.removeAttribute('data-highlighted')
+      codeRef.current.className = codeRef.current.className.replace(/hljs/g, '').trim()
+      // Apply new highlighting
+      hljs.highlightElement(codeRef.current)
+    }
+  }, [activeLang])
 
   const handleParamChange = (paramType, paramName, value) => {
     setParamValues(prev => ({
@@ -657,7 +680,14 @@ print(response.json())`
               <button className="copy-btn" onClick={handleCopyCode}>{copySuccess ? 'copied!' : 'copy'}</button>
             </div>
             <div className="code-box">
-              <pre className="code-block">{codeExamples[activeLang]}</pre>
+              <pre className="code-block">
+                <code 
+                  ref={codeRef}
+                  className={`language-${activeLang === 'curl' ? 'bash' : activeLang === 'nodejs' ? 'javascript' : activeLang}`}
+                >
+                  {codeExamples[activeLang]}
+                </code>
+              </pre>
             </div>
           </div>
 
