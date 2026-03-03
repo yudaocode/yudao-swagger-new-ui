@@ -10,6 +10,14 @@ function isFileProperty(schema) {
 }
 
 /**
+ * 判断 schema 属性是否为多文件类型（数组形式的文件）
+ */
+function isMultipleFileProperty(schema) {
+  if (!schema) return false
+  return schema.type === 'array' && schema.items?.type === 'string' && schema.items?.format === 'binary'
+}
+
+/**
  * 获取输入类型
  */
 function getInputType(schema) {
@@ -68,13 +76,20 @@ function MultipartInput({ schema, paramValues, onParamChange }) {
           const inputType = getInputType(prop.schema)
           const isFile = inputType === 'file'
           const isCheckbox = inputType === 'checkbox'
+          const isMultipleFile = isMultipleFileProperty(prop.schema)
+          const isFileField = isFile || isMultipleFile
+
+          // 显示类型标签
+          const typeLabel = isMultipleFile
+            ? `array of ${prop.schema.items?.format || prop.schema.items?.type}`
+            : (prop.schema.format || prop.schema.type)
 
           return (
             <div key={prop.name} className="param-input-row">
               <label className="param-input-label">
                 {prop.name}
                 {prop.required && <span className="required">*</span>}
-                <span className="param-type-badge">{prop.schema.format || prop.schema.type}</span>
+                <span className="param-type-badge">{typeLabel}</span>
               </label>
               {isCheckbox ? (
                 <input
@@ -83,12 +98,26 @@ function MultipartInput({ schema, paramValues, onParamChange }) {
                   checked={paramValues[`body_${prop.name}`] === 'true'}
                   onChange={(e) => onParamChange('body', prop.name, e.target.checked.toString())}
                 />
-              ) : isFile ? (
-                <input
-                  type="file"
-                  className="param-file"
-                  onChange={(e) => onParamChange('body', prop.name, e.target.files[0])}
-                />
+              ) : isFileField ? (
+                <div className="file-input-wrapper">
+                  <input
+                    type="file"
+                    className="param-file"
+                    multiple={isMultipleFile}
+                    onChange={(e) => {
+                      if (isMultipleFile) {
+                        // 多文件：传递 FileList 或 File 数组
+                        onParamChange('body', prop.name, Array.from(e.target.files))
+                      } else {
+                        // 单文件
+                        onParamChange('body', prop.name, e.target.files[0])
+                      }
+                    }}
+                  />
+                  {isMultipleFile && paramValues[`body_${prop.name}`] && Array.isArray(paramValues[`body_${prop.name}`]) && (
+                    <span className="file-count">{paramValues[`body_${prop.name}`].length} file(s) selected</span>
+                  )}
+                </div>
               ) : (
                 <input
                   type={inputType}

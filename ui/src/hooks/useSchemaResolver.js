@@ -67,7 +67,8 @@ export function useSchemaResolver(apiData) {
         return example
       }
       if (schema.type === 'array') {
-        return [getSchemaExample(schema.items) || {}]
+        const itemExample = getSchemaExample(schema.items)
+        return [itemExample !== null ? itemExample : {}]
       }
       if (schema.type === 'string') return 'string'
       if (schema.type === 'number' || schema.type === 'integer') return 0

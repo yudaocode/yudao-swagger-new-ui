@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useRef, useEffect, useMemo } from 'react'
 import CodeExample, { useCodeExamples } from './CodeExample'
 import ParamsInput from './ParamsInput'
 import MultipartInput from './MultipartInput'
@@ -34,6 +34,37 @@ function TryItPanel({
 }) {
   const [activeLang, setActiveLang] = useState('curl')
   const [copySuccess, setCopySuccess] = useState(false)
+  const [isEditingBody, setIsEditingBody] = useState(false)
+  const textareaRef = useRef(null)
+
+  // 判断 request body 是否为空
+  // 支持对象 {} 和数组 [] 类型的空值判断
+  const isRequestBodyEmpty = useMemo(() => {
+    if (!requestBody) return true
+    const trimmed = requestBody.trim()
+    if (trimmed === '{}' || trimmed === '[]') return true
+    // 尝试解析 JSON，检查是否为空对象或空数组
+    try {
+      const parsed = JSON.parse(trimmed)
+      if (Array.isArray(parsed) && parsed.length === 0) return true
+      if (typeof parsed === 'object' && parsed !== null && Object.keys(parsed).length === 0) return true
+    } catch (e) {
+      // 解析失败，认为有内容
+    }
+    return false
+  }, [requestBody])
+
+  // 当开始编辑时，聚焦 textarea
+  useEffect(() => {
+    if (isEditingBody && textareaRef.current) {
+      textareaRef.current.focus()
+    }
+  }, [isEditingBody])
+
+  // 当切换接口时，退出编辑模式
+  useEffect(() => {
+    setIsEditingBody(false)
+  }, [path, method])
 
   // Generate code examples
   const codeExamples = useCodeExamples({
@@ -91,11 +122,26 @@ function TryItPanel({
           <div className="section-header">
             <span className="section-title">request body</span>
           </div>
-          <textarea
-            className="body-input"
-            value={requestBody}
-            onChange={(e) => onRequestBodyChange(e.target.value)}
-          />
+          {isRequestBodyEmpty && !isEditingBody ? (
+            <div
+              className="body-empty"
+              onClick={() => setIsEditingBody(true)}
+            >
+              <span className="body-empty-text">No content</span>
+            </div>
+          ) : (
+            <textarea
+              ref={textareaRef}
+              className="body-input"
+              value={requestBody}
+              onChange={(e) => onRequestBodyChange(e.target.value)}
+              onBlur={() => {
+                if (isRequestBodyEmpty) {
+                  setIsEditingBody(false)
+                }
+              }}
+            />
+          )}
         </div>
       )}
 

@@ -225,6 +225,8 @@ function MainContent({ endpoint, operation, apiData, theme, onToggleTheme, authT
       setParamValues(prev => ({ ...defaultValues, ...prev }))
       // Clear response data when switching endpoint
       clearResponse()
+      // Clear validation error when switching endpoint
+      setValidationError(null)
     }
   }, [operation, parameters, resolveSchema, clearResponse, setParamValues])
 

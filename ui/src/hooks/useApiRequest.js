@@ -22,7 +22,9 @@ export function useApiRequest({ authToken } = {}) {
    * 检查 paramValues 中是否有文件类型
    */
   const hasFileInParams = useCallback((paramValues) => {
-    return Object.values(paramValues).some(value => value instanceof File)
+    return Object.values(paramValues).some(value => 
+      value instanceof File || (Array.isArray(value) && value.some(v => v instanceof File))
+    )
   }, [])
 
   /**
@@ -36,9 +38,18 @@ export function useApiRequest({ authToken } = {}) {
       Object.keys(multipartSchema.properties).forEach(key => {
         const value = paramValues[`body_${key}`]
         if (value !== undefined && value !== null && value !== '') {
-          if (value instanceof File) {
+          // 处理文件数组（多文件上传）
+          if (Array.isArray(value) && value.some(v => v instanceof File)) {
+            value.forEach(file => {
+              if (file instanceof File) {
+                formData.append(key, file)
+              }
+            })
+          } else if (value instanceof File) {
+            // 单文件上传
             formData.append(key, value)
           } else {
+            // 其他类型
             formData.append(key, value)
           }
         }

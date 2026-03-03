@@ -160,3 +160,15 @@
   color: var(--accent-error);
   margin-left: 2px;
 }
+
+.file-input-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.file-count {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-style: italic;
+}

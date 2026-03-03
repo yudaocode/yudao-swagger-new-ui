@@ -27,9 +27,27 @@ function SchemaViewer({ schema, prefix = '', level = 0 }) {
     const items = schema.items
     const hasNestedProperties = items.properties || items.$ref
 
-    // 如果没有 prefix，直接渲染子元素
+    // 如果没有 prefix，这是顶层 array
     if (!prefix) {
-      return hasNestedProperties ? <SchemaViewer schema={items} prefix="" level={level} /> : null
+      return (
+        <React.Fragment>
+          {/* 显示数组类型信息 */}
+          <div className="param-row" style={{ paddingLeft: `${level * 16}px` }}>
+            <div className="param-col-left">
+              <span className="param-name">items</span>
+              <span className="param-type">
+                array of {items.type || 'any'}
+                {items.format && ` (${items.format})`}
+              </span>
+            </div>
+            <div className="param-col-right">
+              <span className="param-desc">{schema.description || ''}</span>
+            </div>
+          </div>
+          {/* 如果有嵌套属性，继续渲染 */}
+          {hasNestedProperties && <SchemaViewer schema={items} prefix="" level={level} />}
+        </React.Fragment>
+      )
     }
 
     return (
