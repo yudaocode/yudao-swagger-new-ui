@@ -1,0 +1,79 @@
+@use '../../styles/variables' as *;
+@use '../../styles/themes' as *;
+
+.response-display {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.response-display-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 24px;
+}
+
+.response-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.response-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.response-display-box {
+  background-color: var(--surface-bg);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  height: 300px;
+  overflow-y: auto;
+}
+
+.response-placeholder {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 80px;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent-green);
+
+  &.error {
+    color: var(--accent-error);
+  }
+
+  &.success {
+    color: var(--accent-green);
+  }
+}
+
+.code-block {
+  font-size: 12px;
+  color: var(--text-primary);
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-all;
+
+  .key {
+    color: var(--accent-info);
+  }
+
+  .string {
+    color: var(--accent-green);
+  }
+
+  .number {
+    color: var(--accent-warning);
+  }
+}

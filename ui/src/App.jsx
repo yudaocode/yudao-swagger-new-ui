@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import './styles/App.scss'
+import './components/App.scss'
 import Sidebar from './components/Sidebar'
 import MainContent from './components/MainContent'
 import SettingsModal from './components/SettingsModal'

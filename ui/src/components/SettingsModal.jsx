@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import './SettingsModal.scss'
 
 function SettingsModal({ isOpen, onClose, token, onSaveToken }) {
   const [inputToken, setInputToken] = useState('')

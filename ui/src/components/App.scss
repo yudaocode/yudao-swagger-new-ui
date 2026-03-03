@@ -1,0 +1,30 @@
+@use '../styles/variables' as *;
+@use '../styles/themes' as *;
+
+.app {
+  display: flex;
+  height: 100vh;
+  background-color: var(--page-bg);
+
+  &.loading {
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.loading-spinner {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.resize-handle {
+  width: 4px;
+  background-color: transparent;
+  cursor: col-resize;
+  transition: background-color 0.15s;
+  flex-shrink: 0;
+
+  &:hover {
+    background-color: var(--accent-info);
+  }
+}

@@ -4,6 +4,7 @@ import ParamsInput from './ParamsInput'
 import MultipartInput from './MultipartInput'
 import ResponseDisplay from './ResponseDisplay'
 import SendIcon from '../icons/SendIcon'
+import './TryItPanel.scss'
 
 /**
  * 右侧测试面板

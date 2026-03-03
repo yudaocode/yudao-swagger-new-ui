@@ -1,6 +1,7 @@
 import React from 'react'
 import SchemaViewer from './SchemaViewer'
 import ChevronDownIcon from '../icons/ChevronDownIcon'
+import './DocPanel.scss'
 
 /**
  * 根据状态码获取对应的样式类名

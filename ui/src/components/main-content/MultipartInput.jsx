@@ -1,4 +1,5 @@
 import React from 'react'
+import './MultipartInput.scss'
 
 /**
  * 判断 schema 属性是否为文件类型

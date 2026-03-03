@@ -5,6 +5,7 @@ import javascript from 'highlight.js/lib/languages/javascript'
 import python from 'highlight.js/lib/languages/python'
 import java from 'highlight.js/lib/languages/java'
 import go from 'highlight.js/lib/languages/go'
+import './CodeExample.scss'
 
 hljs.registerLanguage('bash', bash)
 hljs.registerLanguage('javascript', javascript)

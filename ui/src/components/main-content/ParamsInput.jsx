@@ -1,4 +1,5 @@
 import React from 'react'
+import './ParamsInput.scss'
 
 /**
  * 获取 schema 的所有属性（展开引用类型）

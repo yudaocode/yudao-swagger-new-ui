@@ -1,4 +1,5 @@
 import React from 'react'
+import './SchemaViewer.scss'
 
 /**
  * Schema 树形渲染组件

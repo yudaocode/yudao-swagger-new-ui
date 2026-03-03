@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useMemo } from 'react'
 import hljs from 'highlight.js/lib/core'
 import json from 'highlight.js/lib/languages/json'
+import './ResponseDisplay.scss'
 
 hljs.registerLanguage('json', json)
 

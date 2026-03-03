@@ -4,6 +4,7 @@ import { DocPanel, TryItPanel } from './main-content'
 import SunIcon from './icons/SunIcon'
 import MoonIcon from './icons/MoonIcon'
 import SettingsIcon from './icons/SettingsIcon'
+import './MainContent.scss'
 
 /**
  * 获取参数的所有字段名（包括嵌套参数）
