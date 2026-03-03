@@ -9,18 +9,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@ConfigurationProperties(prefix = "swagger-ui")
+@ConfigurationProperties(prefix = "swagger-new-ui")
 public class SwaggerUiProperties {
 
     /**
      * Swagger UI 访问路径，支持多个路径（逗号分割）
      */
-    private String paths = "/swagger-ui.html";
+    private String paths = "/swagger-new-ui.html";
 
     /**
      * 分组 API 路径
      */
-    private String groupsApiPath = "/swagger-ui/groups";
+    private String groupsApiPath = "/swagger-new-ui/groups";
 
     /**
      * Swagger UI 的基础 URL 路径
@@ -50,7 +50,7 @@ public class SwaggerUiProperties {
      */
     public List<String> getPathList() {
         if (!StringUtils.hasText(paths)) {
-            return Arrays.asList("/swagger-ui.html");
+            return Arrays.asList("/swagger-new-ui.html");
         }
         return Arrays.stream(paths.split(","))
                 .map(String::trim)

@@ -2,9 +2,7 @@ package cn.coget.swagger.autoconfigure;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -14,9 +12,11 @@ import org.springframework.util.StreamUtils;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.function.RouterFunction;
+import org.springframework.web.servlet.function.ServerRequest;
 import org.springframework.web.servlet.function.ServerResponse;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -51,11 +51,11 @@ public class SwaggerUiAutoConfiguration implements WebMvcConfigurer {
 
     /**
      * 从 groupsApiPath 中提取静态资源路径
-     * 例如: "/swagger-ui/groups" -> "/swagger-ui"
+     * 例如: "/swagger-new-ui/groups" -> "/swagger-new-ui"
      */
     private String extractStaticPath(String groupsApiPath) {
         if (groupsApiPath == null || groupsApiPath.isEmpty()) {
-            return "/swagger-ui";
+            return "/swagger-new-ui";
         }
         int lastSlash = groupsApiPath.lastIndexOf('/');
         if (lastSlash > 0) {
@@ -107,7 +107,7 @@ public class SwaggerUiAutoConfiguration implements WebMvcConfigurer {
      * @param request HTTP 请求对象
      * @return 注入后的 HTML 内容
      */
-    private String injectDynamicInfo(String htmlContent, org.springframework.web.servlet.function.ServerRequest request) {
+    private String injectDynamicInfo(String htmlContent, ServerRequest request) {
         // 构建配置对象
         Map<String, Object> config = new HashMap<>();
         config.put("path", request.path());
@@ -140,12 +140,14 @@ public class SwaggerUiAutoConfiguration implements WebMvcConfigurer {
 
     /**
      * 配置 Swagger 分组信息路由
-     * 仅在 springdoc 存在时才生效
+     * 兼容 SpringDoc 1.x (Spring Boot 2.x) 和 2.x (Spring Boot 3.x)
+     * 
+     * SpringDoc 1.x: org.springdoc.core.GroupedOpenApi
+     * SpringDoc 2.x: org.springdoc.core.models.GroupedOpenApi
      */
     @Bean
-    @ConditionalOnClass(GroupedOpenApi.class)
     public RouterFunction<ServerResponse> swaggerGroupsRouter(
-            @Autowired(required = false) List<GroupedOpenApi> groupedOpenApis) {
+            @Autowired(required = false) List<?> groupedOpenApis) {
         String groupsPath = properties.getGroupsApiPath();
         return route(GET(groupsPath), request -> {
             List<Map<String, String>> groups = new ArrayList<>();
@@ -157,15 +159,17 @@ public class SwaggerUiAutoConfiguration implements WebMvcConfigurer {
             defaultGroup.put("url", properties.getApiPath());
             groups.add(defaultGroup);
             
-            // 添加用户定义的分组
+            // 添加用户定义的分组（通过反射兼容不同版本的 SpringDoc）
             if (groupedOpenApis != null) {
-                for (GroupedOpenApi groupedOpenApi : groupedOpenApis) {
-                    String group = groupedOpenApi.getGroup();
-                    Map<String, String> groupInfo = new HashMap<>();
-                    groupInfo.put("name", group);
-                    groupInfo.put("displayName", group);
-                    groupInfo.put("url", properties.getApiPath() + "/" + group);
-                    groups.add(groupInfo);
+                for (Object groupedOpenApi : groupedOpenApis) {
+                    String group = getGroupFromGroupedOpenApi(groupedOpenApi);
+                    if (group != null) {
+                        Map<String, String> groupInfo = new HashMap<>();
+                        groupInfo.put("name", group);
+                        groupInfo.put("displayName", group);
+                        groupInfo.put("url", properties.getApiPath() + "/" + group);
+                        groups.add(groupInfo);
+                    }
                 }
             }
             
@@ -180,5 +184,23 @@ public class SwaggerUiAutoConfiguration implements WebMvcConfigurer {
                     .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
                     .body(groupsJson);
         });
+    }
+
+    /**
+     * 通过反射获取 GroupedOpenApi 的 group 属性
+     * 兼容 SpringDoc 1.x 和 2.x 的不同包名
+     * 
+     * @param groupedOpenApi GroupedOpenApi 对象
+     * @return group 名称，获取失败返回 null
+     */
+    private String getGroupFromGroupedOpenApi(Object groupedOpenApi) {
+        try {
+            // SpringDoc 1.x 和 2.x 都有 getGroup() 方法
+            Method getGroupMethod = groupedOpenApi.getClass().getMethod("getGroup");
+            return (String) getGroupMethod.invoke(groupedOpenApi);
+        } catch (Exception e) {
+            // 忽略异常，返回 null
+            return null;
+        }
     }
 }

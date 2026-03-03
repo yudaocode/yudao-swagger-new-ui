@@ -1,0 +1,3 @@
+# Spring Boot 2.x 自动配置
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+cn.coget.swagger.autoconfigure.SwaggerUiAutoConfiguration
