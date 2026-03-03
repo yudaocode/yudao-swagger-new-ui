@@ -7,11 +7,11 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.0</version>
+        <version>3.4.2</version>
         <relativePath/>
     </parent>
 
-    <groupId>coget.cn</groupId>
+    <groupId>cn.coget</groupId>
     <artifactId>yudao-swagger-ui-spring-boot3-example</artifactId>
     <version>1.0.1-RELEASE</version>
 
@@ -19,7 +19,7 @@
         <!-- Spring Boot 3 需要 Java 17+，这里使用 JDK 21 -->
         <java.version>21</java.version>
         <lombok.version>1.18.30</lombok.version>
-        <swagger-ui.version>1.0.1-RELEASE</swagger-ui.version>
+        <yudao-swagger-new-ui-boot-starter.version>1.0.1-RELEASE</yudao-swagger-new-ui-boot-starter.version>
     </properties>
 
     <dependencies>
@@ -28,9 +28,15 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
         <dependency>
-            <groupId>coget.cn</groupId>
-            <artifactId>swagger-ui-spring-boot3</artifactId>
-            <version>${swagger-ui.version}</version>
+            <groupId>cn.coget</groupId>
+            <artifactId>yudao-swagger-new-ui-boot-starter</artifactId>
+            <version>${yudao-swagger-new-ui-boot-starter.version}</version>
+        </dependency>
+        <!-- SpringDoc for Spring Boot 3.x -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
+            <version>2.8.4</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>

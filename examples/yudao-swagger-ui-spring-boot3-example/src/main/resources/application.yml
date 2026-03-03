@@ -6,7 +6,7 @@ server:
 
 spring:
   application:
-    name: swagger-ui-spring-boot3-example
+    name: yudao-swagger-ui-spring-boot3-example
 
 swagger-new-ui:
   paths: swagger-new-ui.html,swagger-ui.html,doc.html
