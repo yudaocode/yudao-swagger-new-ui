@@ -5,25 +5,34 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>coget.cn</groupId>
-        <artifactId>examples</artifactId>
-        <version>${revision}</version>
-        <relativePath>../pom.xml</relativePath>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.7.18</version>
+        <relativePath/>
     </parent>
 
+    <groupId>cn.coget</groupId>
     <artifactId>yudao-swagger-ui-spring-boot2-example</artifactId>
+    <version>1.0.1-RELEASE</version>
+
+    <properties>
+        <java.version>1.8</java.version>
+        <lombok.version>1.18.30</lombok.version>
+        <yudao-swagger-new-ui-boot-starter.version>1.0.1-RELEASE</yudao-swagger-new-ui-boot-starter.version>
+        <springdoc-boot2.version>1.7.0</springdoc-boot2.version>
+    </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-            <version>${spring-boot2.version}</version>
         </dependency>
         <dependency>
-            <groupId>coget.cn</groupId>
-            <artifactId>swagger-ui-spring-boot2</artifactId>
-            <version>${project.version}</version>
+            <groupId>cn.coget</groupId>
+            <artifactId>yudao-swagger-new-ui-boot-starter</artifactId>
+            <version>${yudao-swagger-new-ui-boot-starter.version}</version>
         </dependency>
+        <!-- SpringDoc for Spring Boot 2.x -->
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-webmvc-core</artifactId>
@@ -32,8 +41,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>${lombok.version}</version>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
     </dependencies>
 
@@ -42,7 +50,14 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>${spring-boot2.version}</version>
+                <configuration>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
             </plugin>
         </plugins>
     </build>
