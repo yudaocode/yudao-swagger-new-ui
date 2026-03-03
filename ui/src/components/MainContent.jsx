@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react'
-import { useSchemaResolver, useApiRequest } from '../hooks'
+import { useSchemaResolver, useApiRequest, useEndpointParams } from '../hooks'
 import { DocPanel, TryItPanel } from './main-content'
 import SunIcon from './icons/SunIcon'
 import MoonIcon from './icons/MoonIcon'
@@ -10,8 +10,6 @@ import SettingsIcon from './icons/SettingsIcon'
  * 展示 API 端点的详细信息和测试功能
  */
 function MainContent({ endpoint, operation, apiData, theme, onToggleTheme, authToken, onOpenSettings }) {
-  const [requestBody, setRequestBody] = useState('')
-  const [paramValues, setParamValues] = useState({})
   const [collapsedSections, setCollapsedSections] = useState({
     parameters: false,
     requestBody: false,
@@ -70,21 +68,31 @@ function MainContent({ endpoint, operation, apiData, theme, onToggleTheme, authT
   // Track previous operation to reset values only when operation changes
   const prevOperationRef = useRef(null)
 
-  // Initialize request body and params when operation changes
+  // Use endpoint params hook for persistence
+  const {
+    paramValues,
+    requestBody,
+    setParamValues,
+    setRequestBody,
+    updateParamValue,
+  } = useEndpointParams(method, path, requestBodyExample)
+
+  // Initialize default param values when operation changes
   useEffect(() => {
     if (prevOperationRef.current !== operation) {
       prevOperationRef.current = operation
-      setRequestBody(requestBodyExample)
-      const initialValues = {}
+      // Set default empty values for params (will be overridden by stored values in hook)
       const params = op?.parameters || []
+      const defaultValues = {}
       params.forEach(param => {
-        initialValues[`${param.in}_${param.name}`] = ''
+        defaultValues[`${param.in}_${param.name}`] = ''
       })
-      setParamValues(initialValues)
+      // Merge with existing paramValues to keep stored values
+      setParamValues(prev => ({ ...defaultValues, ...prev }))
       // Clear response data when switching endpoint
       clearResponse()
     }
-  }, [operation, requestBodyExample, op, clearResponse])
+  }, [operation, op, clearResponse, setParamValues])
 
   // Handlers
   const handleToggleSection = (sectionKey) => {
@@ -95,10 +103,7 @@ function MainContent({ endpoint, operation, apiData, theme, onToggleTheme, authT
   }
 
   const handleParamChange = (paramType, paramName, value) => {
-    setParamValues(prev => ({
-      ...prev,
-      [`${paramType}_${paramName}`]: value
-    }))
+    updateParamValue(paramType, paramName, value)
   }
 
   const handleSendRequest = () => {
