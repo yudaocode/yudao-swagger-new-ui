@@ -6,6 +6,62 @@ import MoonIcon from './icons/MoonIcon'
 import SettingsIcon from './icons/SettingsIcon'
 
 /**
+ * 获取参数的所有字段名（包括嵌套参数）
+ */
+function getParamFields(params, resolveSchema) {
+  const fields = {}
+  params.forEach(param => {
+    const type = param.in || 'query'
+    const resolvedSchema = resolveSchema(param.schema)
+
+    if (resolvedSchema?.properties) {
+      // 复杂类型，展开属性
+      Object.keys(resolvedSchema.properties).forEach(propName => {
+        fields[`${type}_${param.name}.${propName}`] = ''
+      })
+    } else {
+      // 简单类型
+      fields[`${type}_${param.name}`] = ''
+    }
+  })
+  return fields
+}
+
+/**
+ * 将嵌套参数值转换为请求参数对象
+ */
+function buildRequestParams(paramValues, params, resolveSchema) {
+  const result = {}
+
+  params.forEach(param => {
+    const type = param.in || 'query'
+    const resolvedSchema = resolveSchema(param.schema)
+
+    if (resolvedSchema?.properties) {
+      // 复杂类型，收集嵌套属性值
+      const nestedObj = {}
+      Object.keys(resolvedSchema.properties).forEach(propName => {
+        const key = `${type}_${param.name}.${propName}`
+        if (paramValues[key] !== undefined && paramValues[key] !== '') {
+          nestedObj[propName] = paramValues[key]
+        }
+      })
+      if (Object.keys(nestedObj).length > 0) {
+        result[param.name] = nestedObj
+      }
+    } else {
+      // 简单类型
+      const key = `${type}_${param.name}`
+      if (paramValues[key] !== undefined && paramValues[key] !== '') {
+        result[param.name] = paramValues[key]
+      }
+    }
+  })
+
+  return result
+}
+
+/**
  * 主内容组件
  * 展示 API 端点的详细信息和测试功能
  */
@@ -90,18 +146,14 @@ function MainContent({ endpoint, operation, apiData, theme, onToggleTheme, authT
   useEffect(() => {
     if (prevOperationRef.current !== operation) {
       prevOperationRef.current = operation
-      // Set default empty values for params (will be overridden by stored values in hook)
-      const params = op?.parameters || []
-      const defaultValues = {}
-      params.forEach(param => {
-        defaultValues[`${param.in}_${param.name}`] = ''
-      })
+      // Set default empty values for all param fields (including nested)
+      const defaultValues = getParamFields(parameters, resolveSchema)
       // Merge with existing paramValues to keep stored values
       setParamValues(prev => ({ ...defaultValues, ...prev }))
       // Clear response data when switching endpoint
       clearResponse()
     }
-  }, [operation, op, clearResponse, setParamValues])
+  }, [operation, parameters, resolveSchema, clearResponse, setParamValues])
 
   // Handlers
   const handleToggleSection = (sectionKey) => {
@@ -116,10 +168,14 @@ function MainContent({ endpoint, operation, apiData, theme, onToggleTheme, authT
   }
 
   const handleSendRequest = () => {
+    // Build request params from nested param values
+    const requestParams = buildRequestParams(paramValues, parameters, resolveSchema)
+
     sendRequest({
       method,
       path,
       paramValues,
+      requestParams,
       groupedParams,
       requestBodySchema,
       requestBody,

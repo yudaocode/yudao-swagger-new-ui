@@ -22,6 +22,7 @@ export function useApiRequest({ authToken } = {}) {
     method,
     path,
     paramValues,
+    requestParams,
     groupedParams,
     requestBodySchema,
     requestBody,
@@ -37,13 +38,22 @@ export function useApiRequest({ authToken } = {}) {
         return paramValues[`path_${key}`] || `{${key}}`
       })
 
-      // Build query params
+      // Build query params from requestParams (handles nested params)
       const queryParams = []
       if (groupedParams.query) {
         groupedParams.query.forEach(param => {
-          const val = paramValues[`query_${param.name}`]
-          if (val) {
-            queryParams.push(`${param.name}=${encodeURIComponent(val)}`)
+          const paramValue = requestParams?.[param.name]
+          if (paramValue !== undefined && paramValue !== null) {
+            if (typeof paramValue === 'object') {
+              // Nested object - expand to individual query params
+              Object.entries(paramValue).forEach(([key, value]) => {
+                if (value !== undefined && value !== '') {
+                  queryParams.push(`${key}=${encodeURIComponent(value)}`)
+                }
+              })
+            } else if (paramValue !== '') {
+              queryParams.push(`${param.name}=${encodeURIComponent(paramValue)}`)
+            }
           }
         })
       }

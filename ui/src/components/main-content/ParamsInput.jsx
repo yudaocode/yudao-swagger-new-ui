@@ -1,6 +1,25 @@
 import React from 'react'
 
 /**
+ * 获取 schema 的所有属性（展开引用类型）
+ */
+function getSchemaProperties(schema) {
+  if (!schema) return []
+
+  // 如果有 properties，直接返回
+  if (schema.properties) {
+    return Object.entries(schema.properties).map(([key, prop]) => ({
+      name: key,
+      schema: prop,
+      required: schema.required?.includes(key) || false,
+      description: prop.description || '',
+    }))
+  }
+
+  return []
+}
+
+/**
  * 参数输入表单组件
  * 用于输入 API 请求的各种参数（query、path、header 等）
  */
@@ -16,21 +35,61 @@ function ParamsInput({ groupedParams, paramValues, onParamChange }) {
         {Object.entries(groupedParams).map(([paramType, params]) => (
           <React.Fragment key={paramType}>
             <div className="param-input-type-header">{paramType}</div>
-            {params.map((param, idx) => (
-              <div key={idx} className="param-input-row">
-                <label className="param-input-label">
-                  {param.name}
-                  {param.required && <span className="required">*</span>}
-                </label>
-                <input
-                  type="text"
-                  className="param-input"
-                  placeholder={param.description || ''}
-                  value={paramValues[`${paramType}_${param.name}`] || ''}
-                  onChange={(e) => onParamChange(paramType, param.name, e.target.value)}
-                />
-              </div>
-            ))}
+            {params.map((param, idx) => {
+              // 检查参数是否有复杂 schema（需要展开）
+              const resolvedSchema = param.resolvedSchema
+              const hasComplexSchema = resolvedSchema && resolvedSchema.properties
+
+              if (hasComplexSchema) {
+                // 展开复杂 schema 的属性
+                const properties = getSchemaProperties(resolvedSchema)
+                return (
+                  <React.Fragment key={idx}>
+                    {/* 显示参数名作为分组标题 */}
+                    <div className="param-input-group-label">
+                      {param.name}
+                      {param.required && <span className="required">*</span>}
+                      <span className="param-input-group-type">
+                        {resolvedSchema.$ref?.replace('#/components/schemas/', '') || 'object'}
+                      </span>
+                    </div>
+                    {/* 展开显示每个属性 */}
+                    {properties.map((prop) => (
+                      <div key={prop.name} className="param-input-row param-input-nested">
+                        <label className="param-input-label">
+                          {prop.name}
+                          {prop.required && <span className="required">*</span>}
+                        </label>
+                        <input
+                          type="text"
+                          className="param-input"
+                          placeholder={prop.description || ''}
+                          value={paramValues[`${paramType}_${param.name}.${prop.name}`] || ''}
+                          onChange={(e) => onParamChange(paramType, `${param.name}.${prop.name}`, e.target.value)}
+                        />
+                      </div>
+                    ))}
+                  </React.Fragment>
+                )
+              }
+
+              // 简单类型参数，直接显示输入框
+              return (
+                <div key={idx} className="param-input-row">
+                  <label className="param-input-label">
+                    {param.name}
+                    {param.required && <span className="required">*</span>}
+                  </label>
+                  <input
+                    type="text"
+                    className="param-input"
+                    placeholder={param.description || ''}
+                    value={paramValues[`${paramType}_${param.name}`] || ''}
+                    onChange={(e) => onParamChange(paramType, param.name, e.target.value)}
+                  />
+                </div>
+              )
+            })}
           </React.Fragment>
         ))}
       </div>

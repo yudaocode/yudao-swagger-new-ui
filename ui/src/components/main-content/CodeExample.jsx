@@ -84,6 +84,39 @@ function CodeExample({
 }
 
 /**
+ * Build query params from paramValues (handles nested params)
+ */
+function buildQueryParams(groupedParams, paramValues) {
+  const queryParams = []
+
+  if (groupedParams.query) {
+    groupedParams.query.forEach(param => {
+      const resolvedSchema = param.resolvedSchema
+
+      if (resolvedSchema?.properties) {
+        // Complex type - expand nested properties
+        Object.keys(resolvedSchema.properties).forEach(propName => {
+          const key = `query_${param.name}.${propName}`
+          const val = paramValues[key]
+          if (val !== undefined && val !== '') {
+            queryParams.push(`${propName}=${encodeURIComponent(val)}`)
+          }
+        })
+      } else {
+        // Simple type
+        const key = `query_${param.name}`
+        const val = paramValues[key]
+        if (val !== undefined && val !== '') {
+          queryParams.push(`${param.name}=${encodeURIComponent(val)}`)
+        }
+      }
+    })
+  }
+
+  return queryParams
+}
+
+/**
  * 生成代码示例的 Hook
  */
 export function useCodeExamples({
@@ -127,16 +160,8 @@ export function useCodeExamples({
       requestHeaders['Authorization'] = 'Bearer <your_token>'
     }
 
-    // Build query params
-    const queryParams = []
-    if (groupedParams.query) {
-      groupedParams.query.forEach(param => {
-        const val = paramValues[`query_${param.name}`]
-        if (val) {
-          queryParams.push(`${param.name}=${encodeURIComponent(val)}`)
-        }
-      })
-    }
+    // Build query params (handles nested params)
+    const queryParams = buildQueryParams(groupedParams, paramValues)
     const queryString = queryParams.length > 0 ? `?${queryParams.join('&')}` : ''
 
     const curlHeaders = Object.entries(requestHeaders)
@@ -178,7 +203,7 @@ public class ApiRequest {
     }
 }`
 
-    const go = `package main
+    const goCode = `package main
 
 import (
     "bytes"
@@ -246,7 +271,7 @@ fetch(url, options)
   .then(json => console.log(json))
   .catch(err => console.error('error:' + err));`
 
-    return { curl, java, go, nodejs, python }
+    return { curl, java, go: goCode, nodejs, python }
   }, [method, path, requestBody, paramValues, groupedParams, apiData, requestBodySchema, op, authToken])
 }
 
