@@ -9,6 +9,11 @@ import java.util.Map;
 public class SwaggerUiProperties {
 
     /**
+     * Swagger UI HTML 页面路径
+     */
+    private String htmlPath = "/swagger-new-ui.html";
+
+    /**
      * 分组 API 路径
      */
     private String groupsApiPath = "/swagger-new-ui/groups";
@@ -28,6 +33,14 @@ public class SwaggerUiProperties {
      * 这些信息会被注入到 window.SWAGGER_UI_CONFIG 对象中
      */
     private Map<String, Object> injectConfig = new HashMap<>();
+
+    public String getHtmlPath() {
+        return htmlPath;
+    }
+
+    public void setHtmlPath(String htmlPath) {
+        this.htmlPath = htmlPath;
+    }
 
     public String getGroupsApiPath() {
         return groupsApiPath;

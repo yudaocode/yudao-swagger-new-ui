@@ -69,7 +69,7 @@ public class SwaggerUiAutoConfiguration implements WebMvcConfigurer {
      */
     @Bean
     public RouterFunction<ServerResponse> swaggerUiHtmlRouter() {
-        return route(GET("/swagger-new-ui.html"), request -> {
+        return route(GET(properties.getHtmlPath()), request -> {
             try {
                 // 读取静态 HTML 模板
                 ClassPathResource htmlResource = new ClassPathResource("static/index.html");
