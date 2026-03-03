@@ -291,14 +291,16 @@ print(response.json())`
 
   // Apply syntax highlighting when code changes
   useEffect(() => {
-    if (codeRef.current) {
+    if (codeRef.current && codeExamples[activeLang]) {
+      // Set text content safely (avoids HTML injection warning)
+      codeRef.current.textContent = codeExamples[activeLang]
       // Clear previous highlighting first
       codeRef.current.removeAttribute('data-highlighted')
-      codeRef.current.className = codeRef.current.className.replace(/hljs/g, '').trim()
+      codeRef.current.className = `language-${activeLang === 'curl' ? 'bash' : activeLang === 'nodejs' ? 'javascript' : activeLang}`
       // Apply new highlighting
       hljs.highlightElement(codeRef.current)
     }
-  }, [activeLang])
+  }, [activeLang, codeExamples])
 
   const handleParamChange = (paramType, paramName, value) => {
     setParamValues(prev => ({
@@ -684,9 +686,7 @@ print(response.json())`
                 <code 
                   ref={codeRef}
                   className={`language-${activeLang === 'curl' ? 'bash' : activeLang === 'nodejs' ? 'javascript' : activeLang}`}
-                >
-                  {codeExamples[activeLang]}
-                </code>
+                ></code>
               </pre>
             </div>
           </div>
