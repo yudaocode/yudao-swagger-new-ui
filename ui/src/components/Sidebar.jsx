@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react'
 
-function Sidebar({ endpoints, selectedEndpoint, onSelectEndpoint, apiInfo, width }) {
+function Sidebar({ endpoints, selectedEndpoint, onSelectEndpoint, apiInfo, width, groups, selectedGroup, onSelectGroup }) {
   const [searchTerm, setSearchTerm] = useState('')
 
   const filteredEndpoints = useMemo(() => {
@@ -43,6 +43,29 @@ function Sidebar({ endpoints, selectedEndpoint, onSelectEndpoint, apiInfo, width
         <span className="subtitle">// {apiInfo?.description || 'api documentation'}</span>
         {apiInfo?.version && <span className="api-version">v{apiInfo.version}</span>}
       </div>
+
+      {/* 分组选择器 */}
+      {groups && groups.length > 0 && (
+        <div className="group-selector">
+          <span className="group-label-text">select_group</span>
+          <div className="group-select-wrapper">
+            <select
+              className="group-select"
+              value={selectedGroup}
+              onChange={(e) => onSelectGroup(e.target.value)}
+            >
+              {groups.map((group) => (
+                <option key={group.name} value={group.name}>
+                  {group.displayName}
+                </option>
+              ))}
+            </select>
+            <svg className="group-select-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
+        </div>
+      )}
 
       <div className="search-section">
         <span className="search-label">search_endpoints</span>

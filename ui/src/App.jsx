@@ -20,6 +20,11 @@ function App() {
   const [authToken, setAuthToken] = useState(() => {
     return localStorage.getItem('authToken') || ''
   })
+  // 分组相关状态
+  const [groups, setGroups] = useState([])
+  const [selectedGroup, setSelectedGroup] = useState(() => {
+    return localStorage.getItem('selectedGroup') || 'default'
+  })
   const dragStartX = useRef(0)
   const dragStartWidth = useRef(0)
 
@@ -33,40 +38,116 @@ function App() {
   }, [theme])
 
   useEffect(() => {
+    localStorage.setItem('selectedGroup', selectedGroup)
+  }, [selectedGroup])
+
+  useEffect(() => {
     localStorage.setItem('authToken', authToken)
   }, [authToken])
 
   useEffect(() => {
-    fetchApiData()
+    fetchGroups()
   }, [])
+
+  useEffect(() => {
+    if (groups.length > 0) {
+      fetchApiData()
+    }
+  }, [selectedGroup, groups])
+
+  const fetchGroups = async () => {
+    try {
+      const urlParams = new URLSearchParams(window.location.search)
+      const swaggerConfig = window.SWAGGER_UI_CONFIG || {}
+      const apiPath = urlParams.get('apiPath') || swaggerConfig.apiPath || '/v3/api-docs'
+      const baseUrl = urlParams.get('baseUrl') || swaggerConfig.baseUrl
+      const groupsPath = urlParams.get('groupsPath') || swaggerConfig.groupsPath || '/swagger-new-ui/groups'
+
+      // 构建 groups URL，逻辑与 fetchApiData 中构建 apiDocsUrl 一致
+      let groupsUrl
+      if (baseUrl) {
+        if (baseUrl.startsWith('http')) {
+          // baseUrl 是完整 URL 如 http://localhost:8080
+          groupsUrl = new URL(groupsPath, baseUrl).href
+        } else if (baseUrl.startsWith('/')) {
+          // baseUrl 是路径前缀如 /admin
+          // 拼接: /admin + /swagger-new-ui/groups -> /admin/swagger-new-ui/groups
+          groupsUrl = baseUrl.replace(/\/$/, '') + groupsPath
+        } else {
+          groupsUrl = groupsPath
+        }
+      } else {
+        // 使用相对路径
+        groupsUrl = groupsPath
+      }
+
+      console.log('Fetching groups from:', groupsUrl)
+
+      const response = await fetch(groupsUrl, {
+        headers: {
+          'Accept': 'application/json,*/*',
+        },
+      })
+      
+      if (response.ok) {
+        const groupsData = await response.json()
+        console.log('Groups loaded:', groupsData)
+        setGroups(groupsData)
+        
+        // 如果当前选中的分组不在列表中，选择第一个分组
+        const savedGroup = localStorage.getItem('selectedGroup')
+        if (savedGroup && groupsData.some(g => g.name === savedGroup)) {
+          setSelectedGroup(savedGroup)
+        } else if (groupsData.length > 0) {
+          setSelectedGroup(groupsData[0].name)
+        }
+      } else {
+        console.log('Groups endpoint not available, using default')
+        setGroups([{ name: 'default', displayName: '默认分组', url: apiPath }])
+      }
+    } catch (err) {
+      console.log('Failed to fetch groups, using default:', err)
+      const urlParams = new URLSearchParams(window.location.search)
+      const swaggerConfig = window.SWAGGER_UI_CONFIG || {}
+      const apiPath = urlParams.get('apiPath') || swaggerConfig.apiPath || '/v3/api-docs'
+      setGroups([{ name: 'default', displayName: '默认分组', url: apiPath }])
+    }
+  }
 
   const fetchApiData = async () => {
     try {
       setLoading(true)
       let apiDocsUrl
 
+      // 找到当前选中分组对应的 URL
+      const currentGroup = groups.find(g => g.name === selectedGroup)
       const urlParams = new URLSearchParams(window.location.search)
-      // 参数优先级：URL 参数 > SWAGGER_UI_CONFIG > 默认值
       const swaggerConfig = window.SWAGGER_UI_CONFIG || {}
-      const apiPath = urlParams.get('apiPath') || swaggerConfig.apiPath || '/v3/api-docs'
       const baseUrl = urlParams.get('baseUrl') || swaggerConfig.baseUrl
 
-      if (baseUrl) {
-        if (baseUrl.startsWith('http')) {
-          // baseUrl is a full URL like http://localhost:8080
-          // apiPath is like /v3/api-docs
-          apiDocsUrl = new URL(apiPath, baseUrl).href
-        } else if (baseUrl.startsWith('/')) {
-          // baseUrl is a path prefix like /admin
-          // Combine: /admin + /v3/api-docs -> /admin/v3/api-docs
-          apiDocsUrl = baseUrl.replace(/\/$/, '') + apiPath
+      if (currentGroup) {
+        // 使用分组的 URL
+        if (baseUrl && baseUrl.startsWith('http')) {
+          apiDocsUrl = new URL(currentGroup.url, baseUrl).href
+        } else if (baseUrl && baseUrl.startsWith('/')) {
+          apiDocsUrl = baseUrl.replace(/\/$/, '') + currentGroup.url
         } else {
-          // Use relative path
-          apiDocsUrl = apiPath
+          apiDocsUrl = currentGroup.url
         }
       } else {
-        // Use relative path (will be handled by Vite proxy in development)
-        apiDocsUrl = apiPath
+        // 降级到原有逻辑
+        const apiPath = urlParams.get('apiPath') || swaggerConfig.apiPath || '/v3/api-docs'
+        if (baseUrl) {
+          if (baseUrl.startsWith('http')) {
+            apiDocsUrl = new URL(apiPath, baseUrl).href
+          } else if (baseUrl.startsWith('/')) {
+            apiDocsUrl = baseUrl.replace(/\/$/, '') + apiPath
+          } else {
+            apiDocsUrl = apiPath
+          }
+        } else {
+          apiDocsUrl = apiPath
+        }
       }
 
       console.log('Fetching API docs from:', apiDocsUrl)
@@ -81,6 +162,7 @@ function App() {
       }
       const data = await response.json()
       setApiData(data)
+      setSelectedEndpoint(null) // 切换分组后重置选中的端点
     } catch (err) {
       console.error('Failed to fetch API docs:', err)
       setError(err.message)
@@ -236,6 +318,9 @@ function App() {
         onSelectEndpoint={setSelectedEndpoint}
         apiInfo={apiData?.info}
         width={sidebarWidth}
+        groups={groups}
+        selectedGroup={selectedGroup}
+        onSelectGroup={setSelectedGroup}
       />
       <div
         className="resize-handle"
