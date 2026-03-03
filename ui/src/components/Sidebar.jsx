@@ -1,7 +1,27 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useRef, useEffect } from 'react'
 
 function Sidebar({ endpoints, selectedEndpoint, onSelectEndpoint, apiInfo, width, groups, selectedGroup, onSelectGroup }) {
   const [searchTerm, setSearchTerm] = useState('')
+  const [isGroupMenuOpen, setIsGroupMenuOpen] = useState(false)
+  const groupMenuRef = useRef(null)
+
+  // 点击外部关闭菜单
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (groupMenuRef.current && !groupMenuRef.current.contains(event.target)) {
+        setIsGroupMenuOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  const currentGroup = groups?.find(g => g.name === selectedGroup)
+
+  const handleSelectGroup = (groupName) => {
+    onSelectGroup(groupName)
+    setIsGroupMenuOpen(false)
+  }
 
   const filteredEndpoints = useMemo(() => {
     if (!searchTerm.trim()) return endpoints
@@ -39,33 +59,37 @@ function Sidebar({ endpoints, selectedEndpoint, onSelectEndpoint, apiInfo, width
             </svg>
             <span className="logo-text">{apiInfo?.title || 'swagger'}</span>
           </div>
+          {/* 分组切换按钮 - 仅当有多个分组时显示 */}
+          {groups && groups.length > 1 && (
+            <div className="group-switcher" ref={groupMenuRef}>
+              <button
+                className="group-switcher-btn"
+                onClick={() => setIsGroupMenuOpen(!isGroupMenuOpen)}
+              >
+                <span>{currentGroup?.displayName || selectedGroup}</span>
+                <svg className="group-switcher-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </button>
+              {isGroupMenuOpen && (
+                <div className="group-menu">
+                  {groups.map((group) => (
+                    <div
+                      key={group.name}
+                      className={`group-menu-item ${selectedGroup === group.name ? 'active' : ''}`}
+                      onClick={() => handleSelectGroup(group.name)}
+                    >
+                      {group.displayName}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </div>
         <span className="subtitle">// {apiInfo?.description || 'api documentation'}</span>
         {apiInfo?.version && <span className="api-version">v{apiInfo.version}</span>}
       </div>
-
-      {/* 分组选择器 */}
-      {groups && groups.length > 0 && (
-        <div className="group-selector">
-          <span className="group-label-text">select_group</span>
-          <div className="group-select-wrapper">
-            <select
-              className="group-select"
-              value={selectedGroup}
-              onChange={(e) => onSelectGroup(e.target.value)}
-            >
-              {groups.map((group) => (
-                <option key={group.name} value={group.name}>
-                  {group.displayName}
-                </option>
-              ))}
-            </select>
-            <svg className="group-select-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
-          </div>
-        </div>
-      )}
 
       <div className="search-section">
         <span className="search-label">search_endpoints</span>
