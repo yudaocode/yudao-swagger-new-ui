@@ -7,7 +7,7 @@ import lombok.Data;
 @Schema(description = "用户查询请求")
 public class UserQueryDTO {
 
-    @Schema(description = "用户名")
+    @Schema(description = "用户名", required = true)
     private String username;
 
     @Schema(description = "页码")
