@@ -66,7 +66,7 @@ function buildRequestParams(paramValues, params, resolveSchema) {
  * 主内容组件
  * 展示 API 端点的详细信息和测试功能
  */
-function MainContent({ endpoint, operation, apiData, theme, onToggleTheme, authToken, onOpenSettings }) {
+function MainContent({ endpoint, operation, apiData, theme, onToggleTheme, authToken, onOpenSettings, hasApiData, error, onRetry }) {
   const [collapsedSections, setCollapsedSections] = useState({
     parameters: false,
     requestBody: false,
@@ -211,7 +211,61 @@ function MainContent({ endpoint, operation, apiData, theme, onToggleTheme, authT
     }
   }
 
-  // Render empty state
+  // Render empty state when no API data
+  if (!hasApiData) {
+    return (
+      <main className="main-content">
+        <ToolBar theme={theme} onToggleTheme={onToggleTheme} onOpenSettings={onOpenSettings} />
+        <div className="content-empty-state">
+          <svg className="empty-icon-large" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          <h2 className="empty-title">No API Documentation</h2>
+          <p className="empty-description">
+            {error ? `Failed to load API docs: ${error}` : 'No API documentation available.'}
+          </p>
+          <div className="empty-hints">
+            <div className="hint-item">
+              <svg className="hint-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+              </svg>
+              <span className="hint-text">Check Base URL and API Path settings</span>
+            </div>
+            <div className="hint-item">
+              <svg className="hint-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+              <span className="hint-text">Check if your API requires authentication</span>
+            </div>
+            <div className="hint-item">
+              <svg className="hint-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M12 20h9"></path>
+                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+              </svg>
+              <button className="hint-link" onClick={onOpenSettings}>
+                Open settings to configure →
+              </button>
+            </div>
+          </div>
+          {onRetry && (
+            <button className="retry-button-large" onClick={onRetry}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <polyline points="23 4 23 10 17 10"></polyline>
+                <polyline points="1 20 1 14 7 14"></polyline>
+                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+              </svg>
+              Retry
+            </button>
+          )}
+        </div>
+      </main>
+    )
+  }
+
+  // Render empty state when no endpoint selected
   if (!operation) {
     return (
       <main className="main-content">

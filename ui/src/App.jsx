@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import './components/App.scss'
 import Sidebar from './components/Sidebar'
 import MainContent from './components/MainContent'
@@ -20,7 +20,12 @@ function App() {
   const [authToken, setAuthToken] = useState(() => {
     return localStorage.getItem('authToken') || ''
   })
-  // 分组相关状态
+  const [settingsBaseUrl, setSettingsBaseUrl] = useState(() => {
+    return localStorage.getItem('settingsBaseUrl') || ''
+  })
+  const [settingsApiPath, setSettingsApiPath] = useState(() => {
+    return localStorage.getItem('settingsApiPath') || ''
+  })
   const [groups, setGroups] = useState([])
   const [selectedGroup, setSelectedGroup] = useState(() => {
     return localStorage.getItem('selectedGroup') || 'default'
@@ -29,6 +34,17 @@ function App() {
   const dragStartWidth = useRef(0)
   const hasFetchedGroups = useRef(false)
   const lastFetchedGroup = useRef(null)
+
+  const getConfig = useCallback(() => {
+    const urlParams = new URLSearchParams(window.location.search)
+    const swaggerConfig = window.SWAGGER_UI_CONFIG || {}
+
+    const baseUrl = urlParams.get('baseUrl') || settingsBaseUrl || swaggerConfig.baseUrl
+    const apiPath = urlParams.get('apiPath') || settingsApiPath || swaggerConfig.apiPath || '/v3/api-docs'
+    const groupsPath = urlParams.get('groupsPath') || swaggerConfig.groupsPath || '/swagger-new-ui/groups'
+
+    return { baseUrl, apiPath, groupsPath }
+  }, [settingsBaseUrl, settingsApiPath])
 
   useEffect(() => {
     if (theme === 'light') {
@@ -48,61 +64,51 @@ function App() {
   }, [authToken])
 
   useEffect(() => {
-    // Prevent duplicate fetches in React 18 Strict Mode
-    if (!hasFetchedGroups.current) {
-      hasFetchedGroups.current = true
-      fetchGroups()
-    }
-  }, [])
+    localStorage.setItem('settingsBaseUrl', settingsBaseUrl)
+  }, [settingsBaseUrl])
 
   useEffect(() => {
-    // Only fetch if groups are loaded and we haven't fetched this group yet
-    if (groups.length > 0 && lastFetchedGroup.current !== selectedGroup) {
-      lastFetchedGroup.current = selectedGroup
-      fetchApiData()
-    }
-  }, [selectedGroup, groups])
+    localStorage.setItem('settingsApiPath', settingsApiPath)
+  }, [settingsApiPath])
 
-  const fetchGroups = async () => {
+  const handleSaveSettings = useCallback(({ baseUrl, apiPath }) => {
+    setSettingsBaseUrl(baseUrl)
+    setSettingsApiPath(apiPath)
+  }, [])
+
+  const fetchGroups = useCallback(async () => {
     try {
-      const urlParams = new URLSearchParams(window.location.search)
-      const swaggerConfig = window.SWAGGER_UI_CONFIG || {}
-      const apiPath = urlParams.get('apiPath') || swaggerConfig.apiPath || '/v3/api-docs'
-      const baseUrl = urlParams.get('baseUrl') || swaggerConfig.baseUrl
-      const groupsPath = urlParams.get('groupsPath') || swaggerConfig.groupsPath || '/swagger-new-ui/groups'
+      const { baseUrl, apiPath, groupsPath } = getConfig()
 
-      // 构建 groups URL，逻辑与 fetchApiData 中构建 apiDocsUrl 一致
       let groupsUrl
       if (baseUrl) {
         if (baseUrl.startsWith('http')) {
-          // baseUrl 是完整 URL 如 http://localhost:8080
           groupsUrl = new URL(groupsPath, baseUrl).href
         } else if (baseUrl.startsWith('/')) {
-          // baseUrl 是路径前缀如 /admin
-          // 拼接: /admin + /swagger-new-ui/groups -> /admin/swagger-new-ui/groups
           groupsUrl = baseUrl.replace(/\/$/, '') + groupsPath
         } else {
           groupsUrl = groupsPath
         }
       } else {
-        // 使用相对路径
         groupsUrl = groupsPath
       }
 
       console.log('Fetching groups from:', groupsUrl)
 
-      const response = await fetch(groupsUrl, {
-        headers: {
-          'Accept': 'application/json,*/*',
-        },
-      })
-      
+      const headers = {
+        'Accept': 'application/json,*/*',
+      }
+      if (authToken) {
+        headers['Authorization'] = `Bearer ${authToken}`
+      }
+
+      const response = await fetch(groupsUrl, { headers })
+
       if (response.ok) {
         const groupsData = await response.json()
         console.log('Groups loaded:', groupsData)
         setGroups(groupsData)
-        
-        // 如果当前选中的分组不在列表中，选择第一个分组
+
         const savedGroup = localStorage.getItem('selectedGroup')
         if (savedGroup && groupsData.some(g => g.name === savedGroup)) {
           setSelectedGroup(savedGroup)
@@ -115,123 +121,96 @@ function App() {
       }
     } catch (err) {
       console.log('Failed to fetch groups, using default:', err)
-      const urlParams = new URLSearchParams(window.location.search)
-      const swaggerConfig = window.SWAGGER_UI_CONFIG || {}
-      const apiPath = urlParams.get('apiPath') || swaggerConfig.apiPath || '/v3/api-docs'
+      const { apiPath } = getConfig()
       setGroups([{ name: 'default', displayName: '默认分组', url: apiPath }])
     }
-  }
+  }, [authToken, getConfig])
 
-  const fetchApiData = async () => {
+  const fetchApiData = useCallback(async () => {
     try {
       setLoading(true)
+      setError(null)
       let apiDocsUrl
 
-      // 找到当前选中分组对应的 URL
       const currentGroup = groups.find(g => g.name === selectedGroup)
-      const urlParams = new URLSearchParams(window.location.search)
-      const swaggerConfig = window.SWAGGER_UI_CONFIG || {}
-      const baseUrl = urlParams.get('baseUrl') || swaggerConfig.baseUrl
+      const { baseUrl, apiPath } = getConfig()
 
-      if (currentGroup) {
-        // 使用分组的 URL
-        if (baseUrl && baseUrl.startsWith('http')) {
-          apiDocsUrl = new URL(currentGroup.url, baseUrl).href
-        } else if (baseUrl && baseUrl.startsWith('/')) {
-          apiDocsUrl = baseUrl.replace(/\/$/, '') + currentGroup.url
+      const isRealGroups = groups.length > 0 && !(groups.length === 1 && groups[0].name === 'default')
+      const targetPath = isRealGroups && currentGroup ? currentGroup.url : apiPath
+
+      if (baseUrl) {
+        if (baseUrl.startsWith('http')) {
+          apiDocsUrl = new URL(targetPath, baseUrl).href
+        } else if (baseUrl.startsWith('/')) {
+          apiDocsUrl = baseUrl.replace(/\/$/, '') + targetPath
         } else {
-          apiDocsUrl = currentGroup.url
+          apiDocsUrl = targetPath
         }
       } else {
-        // 降级到原有逻辑
-        const apiPath = urlParams.get('apiPath') || swaggerConfig.apiPath || '/v3/api-docs'
-        if (baseUrl) {
-          if (baseUrl.startsWith('http')) {
-            apiDocsUrl = new URL(apiPath, baseUrl).href
-          } else if (baseUrl.startsWith('/')) {
-            apiDocsUrl = baseUrl.replace(/\/$/, '') + apiPath
-          } else {
-            apiDocsUrl = apiPath
-          }
-        } else {
-          apiDocsUrl = apiPath
-        }
+        apiDocsUrl = targetPath
       }
 
       console.log('Fetching API docs from:', apiDocsUrl)
 
-      const response = await fetch(apiDocsUrl, {
-        headers: {
-          'Accept': 'application/json,*/*',
-        },
-      })
+      const headers = {
+        'Accept': 'application/json,*/*',
+      }
+      if (authToken) {
+        headers['Authorization'] = `Bearer ${authToken}`
+      }
+
+      const response = await fetch(apiDocsUrl, { headers })
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
       const data = await response.json()
       setApiData(data)
-      setSelectedEndpoint(null) // 切换分组后重置选中的端点
+      setSelectedEndpoint(null)
     } catch (err) {
       console.error('Failed to fetch API docs:', err)
       setError(err.message)
-      setApiData(getSampleData())
+      setApiData(null)
     } finally {
       setLoading(false)
     }
-  }
+  }, [groups, selectedGroup, authToken, getConfig])
 
-  const getSampleData = () => ({
-    openapi: '3.0.0',
-    info: {
-      title: 'API Documentation',
-      version: '1.0.0',
-    },
-    paths: {
-      '/users': {
-        get: {
-          summary: 'List users',
-          description: 'Retrieve a list of all users in the system. Supports pagination and filtering.',
-          tags: ['users'],
-          parameters: [
-            { name: 'page', in: 'query', description: 'Page number for pagination', schema: { type: 'integer' } },
-            { name: 'limit', in: 'query', description: 'Items per page, max 50', schema: { type: 'integer' } },
-          ],
-        },
-        post: {
-          summary: 'Create user',
-          description: 'Create a new user in the system.',
-          tags: ['users'],
-        },
-      },
-      '/users/{id}': {
-        get: {
-          summary: 'Get user',
-          description: 'Retrieve a single user by ID.',
-          tags: ['users'],
-          parameters: [
-            { name: 'id', in: 'path', required: true, description: 'User ID', schema: { type: 'integer' } },
-          ],
-        },
-      },
-      '/products': {
-        get: {
-          summary: 'List products',
-          description: 'Retrieve a list of all products.',
-          tags: ['products'],
-        },
-      },
-      '/products/{id}': {
-        delete: {
-          summary: 'Delete product',
-          description: 'Delete a product by ID.',
-          tags: ['products'],
-          parameters: [
-            { name: 'id', in: 'path', required: true, description: 'Product ID', schema: { type: 'integer' } },
-          ],
-        },
-      },
-    },
-  })
+  const prevConfigRef = useRef(null)
+  useEffect(() => {
+    const config = getConfig()
+    const configStr = JSON.stringify(config)
+    if (prevConfigRef.current !== configStr) {
+      prevConfigRef.current = configStr
+      if (hasFetchedGroups.current) {
+        hasFetchedGroups.current = false
+        lastFetchedGroup.current = null
+        setApiData(null)
+        setGroups([])
+      }
+    }
+  }, [getConfig])
+
+  useEffect(() => {
+    if (!hasFetchedGroups.current) {
+      hasFetchedGroups.current = true
+      fetchGroups()
+    }
+  }, [fetchGroups])
+
+  useEffect(() => {
+    if (groups.length > 0 && lastFetchedGroup.current !== selectedGroup) {
+      lastFetchedGroup.current = selectedGroup
+      fetchApiData()
+    }
+  }, [selectedGroup, groups, fetchApiData])
+
+  const prevAuthToken = useRef(authToken)
+  useEffect(() => {
+    if (prevAuthToken.current !== authToken && hasFetchedGroups.current && groups.length > 0) {
+      prevAuthToken.current = authToken
+      fetchApiData()
+    }
+  }, [authToken, fetchApiData, groups])
 
   const parseEndpoints = (data) => {
     if (!data || !data.paths) return []
@@ -308,7 +287,7 @@ function App() {
       window.removeEventListener('mouseup', handleDragEnd)
       window.removeEventListener('mouseleave', handleDragEnd)
     }
-  }, [isDragging])
+  }, [isDragging, sidebarWidth])
 
   if (loading) {
     return (
@@ -329,6 +308,10 @@ function App() {
         groups={groups}
         selectedGroup={selectedGroup}
         onSelectGroup={setSelectedGroup}
+        hasApiData={!!apiData}
+        error={error}
+        onRetry={fetchApiData}
+        onOpenSettings={() => setIsSettingsOpen(true)}
       />
       <div
         className="resize-handle"
@@ -342,12 +325,18 @@ function App() {
         onToggleTheme={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
         authToken={authToken}
         onOpenSettings={() => setIsSettingsOpen(true)}
+        hasApiData={!!apiData}
+        error={error}
+        onRetry={fetchApiData}
       />
       <SettingsModal
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
         token={authToken}
         onSaveToken={setAuthToken}
+        baseUrl={settingsBaseUrl}
+        apiPath={settingsApiPath}
+        onSaveSettings={handleSaveSettings}
       />
     </div>
   )

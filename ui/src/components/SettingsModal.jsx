@@ -1,17 +1,22 @@
 import React, { useState, useEffect } from 'react'
 import './SettingsModal.scss'
 
-function SettingsModal({ isOpen, onClose, token, onSaveToken }) {
+function SettingsModal({ isOpen, onClose, token, onSaveToken, baseUrl, apiPath, onSaveSettings }) {
   const [inputToken, setInputToken] = useState('')
+  const [inputBaseUrl, setInputBaseUrl] = useState('')
+  const [inputApiPath, setInputApiPath] = useState('')
 
   useEffect(() => {
     if (isOpen) {
       setInputToken(token || '')
+      setInputBaseUrl(baseUrl || '')
+      setInputApiPath(apiPath || '')
     }
-  }, [isOpen, token])
+  }, [isOpen, token, baseUrl, apiPath])
 
   const handleSave = () => {
     onSaveToken(inputToken)
+    onSaveSettings({ baseUrl: inputBaseUrl, apiPath: inputApiPath })
     onClose()
   }
 
@@ -36,6 +41,32 @@ function SettingsModal({ isOpen, onClose, token, onSaveToken }) {
           </button>
         </div>
         <div className="modal-body">
+          <div className="setting-item">
+            <label className="setting-label">Base URL</label>
+            <input
+              type="text"
+              className="setting-input"
+              placeholder="e.g., http://localhost:8080 or /admin"
+              value={inputBaseUrl}
+              onChange={(e) => setInputBaseUrl(e.target.value)}
+            />
+            <p className="setting-hint">
+              Base URL for API requests. Leave empty to use relative paths.
+            </p>
+          </div>
+          <div className="setting-item">
+            <label className="setting-label">API Path</label>
+            <input
+              type="text"
+              className="setting-input"
+              placeholder="e.g., /v3/api-docs"
+              value={inputApiPath}
+              onChange={(e) => setInputApiPath(e.target.value)}
+            />
+            <p className="setting-hint">
+              Path to OpenAPI documentation endpoint. Default: /v3/api-docs
+            </p>
+          </div>
           <div className="setting-item">
             <label className="setting-label">Authorization Token</label>
             <input

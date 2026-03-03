@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react'
 import './Sidebar.scss'
 
-function Sidebar({ endpoints, selectedEndpoint, onSelectEndpoint, apiInfo, width, groups, selectedGroup, onSelectGroup }) {
+function Sidebar({ endpoints, selectedEndpoint, onSelectEndpoint, apiInfo, width, groups, selectedGroup, onSelectGroup, hasApiData, error, onRetry, onOpenSettings }) {
   const [searchTerm, setSearchTerm] = useState('')
   const [isGroupMenuOpen, setIsGroupMenuOpen] = useState(false)
   const groupMenuRef = useRef(null)
@@ -129,8 +129,36 @@ function Sidebar({ endpoints, selectedEndpoint, onSelectEndpoint, apiInfo, width
               <span className="search-count">({filteredEndpoints.length})</span>
             )}
           </span>
-          {Object.keys(groupedEndpoints).length === 0 ? (
-            <div className="no-results">No matching endpoints</div>
+          {!hasApiData ? (
+            <div className="api-empty-state">
+              <svg className="empty-icon-small" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+              <p className="empty-text">
+                {error ? `Failed to load: ${error}` : 'No API data available'}
+              </p>
+              {onOpenSettings && (
+                <button className="empty-hint-text" onClick={onOpenSettings}>
+                  Check settings (URL/Token) →
+                </button>
+              )}
+              {onRetry && (
+                <button className="retry-button-small" onClick={onRetry}>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <polyline points="23 4 23 10 17 10"></polyline>
+                    <polyline points="1 20 1 14 7 14"></polyline>
+                    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                  </svg>
+                  Retry
+                </button>
+              )}
+            </div>
+          ) : Object.keys(groupedEndpoints).length === 0 ? (
+            <div className="no-results">
+              {searchTerm ? 'No matching endpoints' : 'No endpoints available'}
+            </div>
           ) : (
             Object.entries(groupedEndpoints).map(([group, eps]) => (
               <div key={group} className="nav-group">
