@@ -8,5 +8,5 @@ spring:
   application:
     name: swagger-ui-example
 
-swagger-ui:
+swagger-new-ui:
   base-url: ${server.servlet.context-path}
