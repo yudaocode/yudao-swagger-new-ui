@@ -3,6 +3,18 @@ import SchemaViewer from './SchemaViewer'
 import ChevronDownIcon from '../icons/ChevronDownIcon'
 
 /**
+ * 根据状态码获取对应的样式类名
+ */
+function getStatusCodeClass(statusCode) {
+  const code = parseInt(statusCode, 10)
+  if (code >= 200 && code < 300) return 'success'
+  if (code >= 300 && code < 400) return 'redirect'
+  if (code >= 400 && code < 500) return 'client-error'
+  if (code >= 500) return 'server-error'
+  return ''
+}
+
+/**
  * 左侧文档面板
  * 展示 API 的参数、请求体和响应结构
  */
@@ -154,7 +166,7 @@ function DocPanel({
                 style={{ cursor: 'pointer' }}
               >
                 <span className="params-title">responses</span>
-                <span className={`status-code ${response.statusCode.startsWith('2') ? 'success' : ''}`}>
+                <span className={`status-code ${getStatusCodeClass(response.statusCode)}`}>
                   {response.statusCode}
                 </span>
                 <span className="response-desc">{response.description}</span>

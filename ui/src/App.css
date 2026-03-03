@@ -949,6 +949,7 @@
 
 .params-header .status-code {
   margin-left: auto;
+  text-align: right;
 }
 
 .params-title {
@@ -983,6 +984,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+  margin-top: 12px;
 }
 
 .param-row {
@@ -1087,8 +1089,24 @@
   min-width: 50px;
 }
 
+/* 2xx 成功响应 */
 .status-code.success {
   color: var(--accent-green);
+}
+
+/* 3xx 重定向 */
+.status-code.redirect {
+  color: var(--accent-info);
+}
+
+/* 4xx 客户端错误 */
+.status-code.client-error {
+  color: var(--accent-warning);
+}
+
+/* 5xx 服务器错误 */
+.status-code.server-error {
+  color: var(--accent-error);
 }
 
 .response-desc {
