@@ -10,6 +10,7 @@ function MainContent({ endpoint, operation, apiData, theme, onToggleTheme, authT
     parameters: false,
     requestBody: false,
   })
+  const [copySuccess, setCopySuccess] = useState(false)
 
   const resolveRef = useMemo(() => {
     const schemas = apiData?.components?.schemas || {}
@@ -150,6 +151,8 @@ function MainContent({ endpoint, operation, apiData, theme, onToggleTheme, authT
   const handleCopyCode = async () => {
     try {
       await navigator.clipboard.writeText(codeExamples[activeLang])
+      setCopySuccess(true)
+      setTimeout(() => setCopySuccess(false), 2000)
     } catch (err) {
       console.error('Failed to copy:', err)
     }
@@ -651,7 +654,7 @@ print(response.json())`
           <div className="code-section">
             <div className="code-header">
               <span className="code-label">&gt; {activeLang}</span>
-              <button className="copy-btn">copy</button>
+              <button className="copy-btn" onClick={handleCopyCode}>{copySuccess ? 'copied!' : 'copy'}</button>
             </div>
             <div className="code-box">
               <pre className="code-block">{codeExamples[activeLang]}</pre>
