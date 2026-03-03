@@ -512,10 +512,93 @@
   background-color: var(--surface-bg);
   border-radius: var(--radius-sm);
   padding: 12px;
-  max-height: 600px;
-  min-height: 100px;
+  max-height: 400px;
+  min-height: 300px;
   overflow-y: auto;
   resize: vertical;
+}
+
+.code-box .code-block {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+}
+
+.code-box .code-block code {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+
+/* Code Syntax Highlighting - Theme Aware */
+.code-box .hljs-keyword,
+.code-box .hljs-selector-tag,
+.code-box .hljs-built_in,
+.code-box .hljs-name,
+.code-box .hljs-tag {
+  color: var(--hljs-keyword);
+}
+
+.code-box .hljs-string,
+.code-box .hljs-title,
+.code-box .hljs-section,
+.code-box .hljs-attribute,
+.code-box .hljs-literal,
+.code-box .hljs-template-tag,
+.code-box .hljs-template-variable,
+.code-box .hljs-type {
+  color: var(--hljs-string);
+}
+
+.code-box .hljs-number,
+.code-box .hljs-regexp,
+.code-box .hljs-link {
+  color: var(--hljs-number);
+}
+
+.code-box .hljs-comment,
+.code-box .hljs-quote,
+.code-box .hljs-meta {
+  color: var(--hljs-comment);
+}
+
+.code-box .hljs-function,
+.code-box .hljs-selector-id,
+.code-box .hljs-selector-class {
+  color: var(--hljs-function);
+}
+
+.code-box .hljs-variable,
+.code-box .hljs-params {
+  color: var(--hljs-variable);
+}
+
+.code-box .hljs-operator,
+.code-box .hljs-bullet {
+  color: var(--hljs-operator);
+}
+
+.code-box .hljs-class .hljs-title,
+.code-box .hljs-title.class_ {
+  color: var(--hljs-class);
+}
+
+.code-box .hljs-property,
+.code-box .hljs-attr {
+  color: var(--hljs-property);
+}
+
+.code-box .hljs-built_in {
+  color: var(--hljs-builtin);
+}
+
+.code-box .hljs-addition {
+  color: var(--accent-green);
+}
+
+.code-box .hljs-deletion {
+  color: var(--accent-error);
 }
 
 /* Params Input Section */

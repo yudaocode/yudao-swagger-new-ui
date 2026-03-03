@@ -17,6 +17,18 @@
   --spacing-sm: 8px;
   --spacing-md: 16px;
   --spacing-lg: 32px;
+
+  /* Code Highlight Colors - Dark Theme */
+  --hljs-keyword: #FF79C6;
+  --hljs-string: #F1FA8C;
+  --hljs-number: #BD93F9;
+  --hljs-comment: #6272A4;
+  --hljs-function: #50FA7B;
+  --hljs-variable: #F8F8F2;
+  --hljs-operator: #FF79C6;
+  --hljs-class: #8BE9FD;
+  --hljs-property: #66D9EF;
+  --hljs-builtin: #FFB86C;
 }
 
 [data-theme="light"] {
@@ -33,6 +45,18 @@
   --accent-info: #2563EB;
   --accent-warning: #D97706;
   --accent-error: #DC2626;
+
+  /* Code Highlight Colors - Light Theme */
+  --hljs-keyword: #D73A49;
+  --hljs-string: #032F62;
+  --hljs-number: #005CC5;
+  --hljs-comment: #6A737D;
+  --hljs-function: #6F42C1;
+  --hljs-variable: #24292E;
+  --hljs-operator: #D73A49;
+  --hljs-class: #6F42C1;
+  --hljs-property: #005CC5;
+  --hljs-builtin: #E36209;
 }
 
 * {
