@@ -11,7 +11,7 @@
 
     <modules>
         <module>swagger-ui-spring-boot2</module>
-        <module>swagger-ui-spring-boot3</module>
+<!--        <module>swagger-ui-spring-boot3</module>-->
         <module>examples</module>
     </modules>
 
@@ -21,7 +21,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         
         <!-- 版本号统一管理 -->
-        <revision>1.0-RELEASE</revision>
+        <revision>1.0.1-RELEASE</revision>
         
         <!-- Spring Boot 版本 -->
         <spring-boot2.version>2.7.18</spring-boot2.version>
@@ -51,25 +51,9 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository>
-        <repository>
-            <id>maven-releases</id>
-            <url>https://repo.gitcode.com/repository/maven-releases/</url>
-        </repository>
-        <repository>
-            <id>maven-snapshot</id>
-            <url>https://repo.gitcode.com/repository/maven-snapshots/</url>
-        </repository>
     </repositories>
 
     <distributionManagement>
-        <repository>
-            <id>maven-releases</id>
-            <url>https://repo.gitcode.com/repository/maven-releases/</url>
-        </repository>
-        <snapshotRepository>
-            <id>maven-snapshots</id>
-            <url>https://repo.gitcode.com/repository/maven-snapshots/</url>
-        </snapshotRepository>
     </distributionManagement>
 
     <build>
