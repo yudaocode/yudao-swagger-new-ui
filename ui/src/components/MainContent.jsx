@@ -21,6 +21,7 @@ function MainContent({ endpoint, operation, apiData, theme, onToggleTheme, authT
     requestBody: false,
   })
   const [copySuccess, setCopySuccess] = useState(false)
+  const [responseCopySuccess, setResponseCopySuccess] = useState(false)
 
   const codeRef = useRef(null)
 
@@ -170,12 +171,31 @@ function MainContent({ endpoint, operation, apiData, theme, onToggleTheme, authT
     }
   }
 
+  const handleCopyResponse = async () => {
+    try {
+      const responseText = responseData.error
+        ? responseData.message
+        : formatJson(responseData.data)
+      await navigator.clipboard.writeText(responseText)
+      setResponseCopySuccess(true)
+      setTimeout(() => setResponseCopySuccess(false), 2000)
+    } catch (err) {
+      console.error('Failed to copy response:', err)
+    }
+  }
+
   const getBaseUrl = () => {
     const servers = apiData?.servers || []
     if (servers.length > 0) {
       return servers[0].url
     }
     return ''
+  }
+
+  // Get the baseUrl from SWAGGER_UI_CONFIG (same logic as App.jsx)
+  const getConfigBaseUrl = () => {
+    const swaggerConfig = window.SWAGGER_UI_CONFIG || {}
+    return swaggerConfig.baseUrl || ''
   }
 
   // Generate code examples
@@ -345,7 +365,25 @@ print(response.json())`
         options.body = requestBody
       }
 
-      const response = await fetch(fullPath + queryString, options)
+      // Build the full URL with baseUrl prefix (same logic as App.jsx)
+      const configBaseUrl = getConfigBaseUrl()
+      let requestUrl
+      if (configBaseUrl) {
+        if (configBaseUrl.startsWith('http')) {
+          // baseUrl is a full URL like http://localhost:8080
+          requestUrl = new URL(fullPath, configBaseUrl).href
+        } else if (configBaseUrl.startsWith('/')) {
+          // baseUrl is a path prefix like /admin
+          // Combine: /admin + /api/users -> /admin/api/users
+          requestUrl = configBaseUrl.replace(/\/$/, '') + fullPath
+        } else {
+          requestUrl = fullPath
+        }
+      } else {
+        requestUrl = fullPath
+      }
+
+      const response = await fetch(requestUrl + queryString, options)
       const data = await response.json()
 
       setResponseData({
@@ -749,14 +787,17 @@ print(response.json())`
           {responseData && (
             <div className="response-display">
               <div className="response-display-header">
-                <span className="response-label">&gt; response</span>
-                {responseData.error ? (
-                  <span className="status-badge error">Error</span>
-                ) : (
-                  <span className={`status-badge ${responseData.status >= 200 && responseData.status < 300 ? 'success' : ''}`}>
-                    {responseData.status} {responseData.statusText}
-                  </span>
-                )}
+                <div className="response-info">
+                  <span className="response-label">&gt; response</span>
+                  {responseData.error ? (
+                    <span className="status-badge error">Error</span>
+                  ) : (
+                    <span className={`status-badge ${responseData.status >= 200 && responseData.status < 300 ? 'success' : ''}`}>
+                      {responseData.status} {responseData.statusText}
+                    </span>
+                  )}
+                </div>
+                <button className="copy-btn" onClick={handleCopyResponse}>{responseCopySuccess ? 'copied!' : 'copy'}</button>
               </div>
               <div className="response-display-box">
                 <pre className="code-block">

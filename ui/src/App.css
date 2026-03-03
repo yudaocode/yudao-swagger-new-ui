@@ -729,6 +729,12 @@
   justify-content: space-between;
 }
 
+.response-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .response-display-box {
   background-color: var(--surface-bg);
   border-radius: var(--radius-sm);
