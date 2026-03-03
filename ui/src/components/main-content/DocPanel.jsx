@@ -10,6 +10,8 @@ function DocPanel({
   op,
   groupedParams,
   requestBodySchema,
+  multipartSchema,
+  isMultipartRequest,
   responses,
   collapsedSections,
   onToggleSection,
@@ -69,8 +71,8 @@ function DocPanel({
         </div>
       )}
 
-      {/* Request Body Section */}
-      {requestBodySchema && (
+      {/* Request Body Section (JSON) */}
+      {requestBodySchema && !isMultipartRequest && (
         <div className="params-section">
           <div
             className="params-header"
@@ -89,6 +91,52 @@ function DocPanel({
               )}
               <div className="params-table">
                 <SchemaViewer schema={requestBodySchema} />
+              </div>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* Multipart Form Data Section */}
+      {isMultipartRequest && multipartSchema && (
+        <div className="params-section">
+          <div
+            className="params-header"
+            onClick={() => onToggleSection('requestBody')}
+            style={{ cursor: 'pointer' }}
+          >
+            <span className="params-title">request body</span>
+            <span className="content-type-badge">multipart/form-data</span>
+            <ChevronDownIcon
+              className={`toggle-icon ${collapsedSections.requestBody ? 'collapsed' : ''}`}
+            />
+          </div>
+          {!collapsedSections.requestBody && (
+            <>
+              {op.requestBody?.description && (
+                <p className="section-desc">{op.requestBody.description}</p>
+              )}
+              <div className="params-table">
+                <div className="param-type-header">form data</div>
+                {multipartSchema.properties && Object.entries(multipartSchema.properties).map(([fieldName, fieldSchema]) => (
+                  <div key={fieldName} className="param-row">
+                    <div className="param-col-left">
+                      <span className="param-name">
+                        {fieldName}
+                        {multipartSchema.required?.includes(fieldName) && <span className="required">*</span>}
+                      </span>
+                      <span className="param-type">
+                        {fieldSchema.format || fieldSchema.type}
+                      </span>
+                    </div>
+                    <div className="param-col-right">
+                      <span className="param-desc">{fieldSchema.description || ''}</span>
+                      {multipartSchema.required?.includes(fieldName) && (
+                        <span className="param-meta">required</span>
+                      )}
+                    </div>
+                  </div>
+                ))}
               </div>
             </>
           )}

@@ -85,6 +85,18 @@ function MainContent({ endpoint, operation, apiData, theme, onToggleTheme, authT
     return resolveSchema(schema)
   }, [op, resolveSchema])
 
+  // Multipart form data schema (for file uploads)
+  const multipartSchema = useMemo(() => {
+    if (!op) return null
+    const schema = op.requestBody?.content?.['multipart/form-data']?.schema
+    return resolveSchema(schema)
+  }, [op, resolveSchema])
+
+  // Check if this is a multipart/form-data request
+  const isMultipartRequest = useMemo(() => {
+    return !!op?.requestBody?.content?.['multipart/form-data']
+  }, [op])
+
   const responses = useMemo(() => {
     if (!op?.responses) return []
 
@@ -180,6 +192,8 @@ function MainContent({ endpoint, operation, apiData, theme, onToggleTheme, authT
       requestBodySchema,
       requestBody,
       op,
+      isMultipartRequest,
+      multipartSchema,
     })
   }
 
@@ -239,6 +253,8 @@ function MainContent({ endpoint, operation, apiData, theme, onToggleTheme, authT
           op={op}
           groupedParams={groupedParams}
           requestBodySchema={requestBodySchema}
+          multipartSchema={multipartSchema}
+          isMultipartRequest={isMultipartRequest}
           responses={responses}
           collapsedSections={collapsedSections}
           onToggleSection={handleToggleSection}
@@ -251,6 +267,8 @@ function MainContent({ endpoint, operation, apiData, theme, onToggleTheme, authT
           op={op}
           apiData={apiData}
           requestBodySchema={requestBodySchema}
+          multipartSchema={multipartSchema}
+          isMultipartRequest={isMultipartRequest}
           requestBody={requestBody}
           onRequestBodyChange={setRequestBody}
           groupedParams={groupedParams}

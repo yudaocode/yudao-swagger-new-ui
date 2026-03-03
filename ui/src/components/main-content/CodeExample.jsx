@@ -117,6 +117,33 @@ function buildQueryParams(groupedParams, paramValues) {
 }
 
 /**
+ * Build multipart form data entries from schema and paramValues
+ */
+function buildMultipartFormData(multipartSchema, paramValues) {
+  const formData = []
+
+  if (multipartSchema?.properties) {
+    Object.keys(multipartSchema.properties).forEach(key => {
+      const prop = multipartSchema.properties[key]
+      const value = paramValues[`body_${key}`]
+
+      if (value !== undefined && value !== null && value !== '') {
+        const isFile = prop.type === 'string' && prop.format === 'binary'
+        formData.push({
+          key,
+          value,
+          isFile,
+          type: prop.type,
+          format: prop.format,
+        })
+      }
+    })
+  }
+
+  return formData
+}
+
+/**
  * 生成代码示例的 Hook
  */
 export function useCodeExamples({
@@ -143,6 +170,10 @@ export function useCodeExamples({
       return ''
     }
 
+    // Check if this is a multipart request
+    const isMultipartRequest = !!op?.requestBody?.content?.['multipart/form-data']
+    const multipartSchema = op?.requestBody?.content?.['multipart/form-data']?.schema
+
     const baseUrl = getBaseUrl()
     const fullPath = path.replace(/\{(\w+)\}/g, (_, key) => {
       const val = paramValues[`path_${key}`] || `{${key}}`
@@ -151,8 +182,9 @@ export function useCodeExamples({
     const url = `${baseUrl}${fullPath}`
 
     // Build headers
-    const requestHeaders = {
-      'Content-Type': 'application/json',
+    const requestHeaders = {}
+    if (!isMultipartRequest) {
+      requestHeaders['Content-Type'] = 'application/json'
     }
     if (authToken) {
       requestHeaders['Authorization'] = `Bearer ${authToken}`
@@ -164,16 +196,78 @@ export function useCodeExamples({
     const queryParams = buildQueryParams(groupedParams, paramValues)
     const queryString = queryParams.length > 0 ? `?${queryParams.join('&')}` : ''
 
-    const curlHeaders = Object.entries(requestHeaders)
-      .map(([k, v]) => `  -H "${k}: ${v}"`)
-      .join(' \\\n')
+    // Build multipart form data if applicable
+    const multipartData = isMultipartRequest ? buildMultipartFormData(multipartSchema, paramValues) : []
 
-    const curl = `curl -X ${method.toUpperCase()} \\
+    // Generate curl command
+    let curl
+    if (isMultipartRequest && multipartData.length > 0) {
+      const curlHeaders = Object.entries(requestHeaders)
+        .map(([k, v]) => `  -H "${k}: ${v}"`)
+        .join(' \\\n')
+
+      const curlForm = multipartData.map(item => {
+        if (item.isFile) {
+          return `  -F "${item.key}=@/path/to/file"`
+        }
+        return `  -F "${item.key}=${item.value}"`
+      }).join(' \\\n')
+
+      curl = `curl -X ${method.toUpperCase()} \\
   "${url}${queryString}" \\
-${curlHeaders}${requestBodySchema ? ` \\
-  -d '${requestBody.replace(/'/g, "\\'")}'` : ''}`
+${curlHeaders}${curlForm ? ` \\\n${curlForm}` : ''}`
+    } else {
+      const curlHeaders = Object.entries(requestHeaders)
+        .map(([k, v]) => `  -H "${k}: ${v}"`)
+        .join(' \\\n')
 
-    const java = `import java.net.URI;
+      curl = `curl -X ${method.toUpperCase()} \\
+  "${url}${queryString}" \\
+${curlHeaders}${requestBodySchema ? ` \\\n  -d '${requestBody.replace(/'/g, "\\'")}'` : ''}`
+    }
+
+    // Generate Java code
+    let java
+    if (isMultipartRequest && multipartData.length > 0) {
+      java = `import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
+
+public class ApiRequest {
+    public static void main(String[] args) throws Exception {
+        HttpClient client = HttpClient.newHttpClient();
+        String url = "${url}${queryString}";
+
+        HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString("");
+${multipartData.map(item => {
+  if (item.isFile) {
+    return `        // File: ${item.key}`
+  }
+  return `        // Field: ${item.key} = ${item.value}`
+}).join('\n')}
+        // Note: For multipart/form-data in Java, consider using
+        // Apache HttpClient or Spring RestTemplate for better support
+
+        HttpRequest.Builder builder = HttpRequest.newBuilder()
+            .uri(URI.create(url))
+            .${method.toLowerCase()}(body);
+
+${Object.entries(requestHeaders).map(([k, v]) => `        builder.header("${k}", "${v}");`).join('\n')}
+
+        HttpResponse<String> response = client.send(
+            builder.build(),
+            HttpResponse.BodyHandlers.ofString()
+        );
+
+        System.out.println(response.body());
+    }
+}`
+    } else {
+      java = `import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -202,8 +296,62 @@ public class ApiRequest {
         System.out.println(response.body());
     }
 }`
+    }
 
-    const goCode = `package main
+    // Generate Go code
+    let goCode
+    if (isMultipartRequest && multipartData.length > 0) {
+      goCode = `package main
+
+import (
+    "bytes"
+    "fmt"
+    "io"
+    "mime/multipart"
+    "net/http"
+    "os"
+)
+
+func main() {
+    url := "${url}${queryString}"
+
+    // Create multipart form
+    body := &bytes.Buffer{}
+    writer := multipart.NewWriter(body)
+
+${multipartData.map(item => {
+  if (item.isFile) {
+    return `    // Add file: ${item.key}
+    file, _ := os.Open("/path/to/${item.key}")
+    defer file.Close()
+    part, _ := writer.CreateFormFile("${item.key}", "filename")
+    io.Copy(part, file)`
+  }
+  return `    writer.WriteField("${item.key}", "${item.value || 'value'}")`
+}).join('\n')}
+
+    writer.Close()
+
+    client := &http.Client{}
+    req, err := http.NewRequest("${method.toUpperCase()}", url, body)
+    if err != nil {
+        panic(err)
+    }
+
+${Object.entries(requestHeaders).map(([k, v]) => `    req.Header.Set("${k}", "${v}")`).join('\n')}
+    req.Header.Set("Content-Type", writer.FormDataContentType())
+
+    resp, err := client.Do(req)
+    if err != nil {
+        panic(err)
+    }
+    defer resp.Body.Close()
+
+    respBody, _ := io.ReadAll(resp.Body)
+    fmt.Println(string(respBody))
+}`
+    } else {
+      goCode = `package main
 
 import (
     "bytes"
@@ -236,8 +384,37 @@ ${Object.entries(requestHeaders).map(([k, v]) => `    req.Header.Set("${k}", "${
     json.Unmarshal(body, &result)
     fmt.Println(result)
 }`
+    }
 
-    const python = `import requests
+    // Generate Python code
+    let python
+    if (isMultipartRequest && multipartData.length > 0) {
+      python = `import requests
+
+url = "${url}${queryString}"
+
+headers = {
+${Object.entries(requestHeaders).map(([k, v]) => `    "${k}": "${v}"`).join(',\n')}
+}
+
+files = {
+${multipartData.filter(item => item.isFile).map(item => `    "${item.key}": open("/path/to/file", "rb")`).join(',\n')}
+}
+data = {
+${multipartData.filter(item => !item.isFile).map(item => `    "${item.key}": "${item.value || ''}"`).join(',\n')}
+}
+
+response = requests.${method.toLowerCase()}(
+    url,
+    headers=headers,
+    files=files,
+    data=data
+)
+
+print(response.status_code)
+print(response.json())`
+    } else {
+      python = `import requests
 
 url = "${url}${queryString}"
 
@@ -254,8 +431,39 @@ response = requests.${method.toLowerCase()}(
 
 print(response.status_code)
 print(response.json())`
+    }
 
-    const nodejs = `const fetch = require('node-fetch');
+    // Generate Node.js code
+    let nodejs
+    if (isMultipartRequest && multipartData.length > 0) {
+      nodejs = `const FormData = require('form-data');
+const fs = require('fs');
+const fetch = require('node-fetch');
+
+const url = "${url}${queryString}";
+
+const formData = new FormData();
+${multipartData.map(item => {
+  if (item.isFile) {
+    return `formData.append('${item.key}', fs.createReadStream('/path/to/file'));`
+  }
+  return `formData.append('${item.key}', '${item.value || ''}');`
+}).join('\n')}
+
+const options = {
+  method: '${method.toUpperCase()}',
+  headers: {
+${Object.entries(requestHeaders).map(([k, v]) => `    '${k}': '${v}'`).join(',\n')}
+  },
+  body: formData
+};
+
+fetch(url, options)
+  .then(res => res.json())
+  .then(json => console.log(json))
+  .catch(err => console.error('error:' + err));`
+    } else {
+      nodejs = `const fetch = require('node-fetch');
 
 const url = "${url}${queryString}";
 const options = {
@@ -270,6 +478,7 @@ fetch(url, options)
   .then(res => res.json())
   .then(json => console.log(json))
   .catch(err => console.error('error:' + err));`
+    }
 
     return { curl, java, go: goCode, nodejs, python }
   }, [method, path, requestBody, paramValues, groupedParams, apiData, requestBodySchema, op, authToken])

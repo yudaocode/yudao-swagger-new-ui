@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import CodeExample, { useCodeExamples } from './CodeExample'
 import ParamsInput from './ParamsInput'
+import MultipartInput from './MultipartInput'
 import ResponseDisplay from './ResponseDisplay'
 import SendIcon from '../icons/SendIcon'
 
@@ -14,6 +15,8 @@ function TryItPanel({
   op,
   apiData,
   requestBodySchema,
+  multipartSchema,
+  isMultipartRequest,
   requestBody,
   onRequestBodyChange,
   groupedParams,
@@ -70,8 +73,17 @@ function TryItPanel({
         onParamChange={onParamChange}
       />
 
-      {/* Request Body Input */}
-      {requestBodySchema && (
+      {/* Multipart Form Data Input */}
+      {isMultipartRequest && (
+        <MultipartInput
+          schema={multipartSchema}
+          paramValues={paramValues}
+          onParamChange={onParamChange}
+        />
+      )}
+
+      {/* Request Body Input (JSON) */}
+      {requestBodySchema && !isMultipartRequest && (
         <div className="body-input-section">
           <div className="section-header">
             <span className="section-title">request body</span>

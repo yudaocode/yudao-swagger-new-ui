@@ -18,6 +18,36 @@ export function useApiRequest({ authToken } = {}) {
     return swaggerConfig.baseUrl || ''
   }, [])
 
+  /**
+   * 检查 paramValues 中是否有文件类型
+   */
+  const hasFileInParams = useCallback((paramValues) => {
+    return Object.values(paramValues).some(value => value instanceof File)
+  }, [])
+
+  /**
+   * 构建 FormData
+   */
+  const buildFormData = useCallback((paramValues, multipartSchema) => {
+    const formData = new FormData()
+
+    // 遍历 multipart schema 的属性
+    if (multipartSchema?.properties) {
+      Object.keys(multipartSchema.properties).forEach(key => {
+        const value = paramValues[`body_${key}`]
+        if (value !== undefined && value !== null && value !== '') {
+          if (value instanceof File) {
+            formData.append(key, value)
+          } else {
+            formData.append(key, value)
+          }
+        }
+      })
+    }
+
+    return formData
+  }, [])
+
   const sendRequest = useCallback(async ({
     method,
     path,
@@ -27,6 +57,8 @@ export function useApiRequest({ authToken } = {}) {
     requestBodySchema,
     requestBody,
     op,
+    isMultipartRequest,
+    multipartSchema,
   }) => {
     setLoading(true)
     setResponseData(null)
@@ -60,9 +92,13 @@ export function useApiRequest({ authToken } = {}) {
       const queryString = queryParams.length > 0 ? `?${queryParams.join('&')}` : ''
 
       // Build headers
-      const headers = {
-        'Content-Type': 'application/json',
+      const headers = {}
+
+      // For multipart/form-data, don't set Content-Type, let browser set it with boundary
+      if (!isMultipartRequest) {
+        headers['Content-Type'] = 'application/json'
       }
+
       if (authToken) {
         headers['Authorization'] = `Bearer ${authToken}`
       }
@@ -72,7 +108,12 @@ export function useApiRequest({ authToken } = {}) {
         headers,
       }
 
-      if (requestBodySchema && requestBody) {
+      // Handle request body
+      if (isMultipartRequest && multipartSchema) {
+        // Build FormData for multipart requests
+        const formData = buildFormData(paramValues, multipartSchema)
+        options.body = formData
+      } else if (requestBodySchema && requestBody) {
         options.body = requestBody
       }
 
@@ -92,7 +133,15 @@ export function useApiRequest({ authToken } = {}) {
       }
 
       const response = await fetch(requestUrl + queryString, options)
-      const data = await response.json()
+
+      // Try to parse JSON response, fallback to text if not JSON
+      let data
+      const contentType = response.headers.get('content-type')
+      if (contentType && contentType.includes('application/json')) {
+        data = await response.json()
+      } else {
+        data = await response.text()
+      }
 
       const result = {
         success: true,
@@ -126,7 +175,7 @@ export function useApiRequest({ authToken } = {}) {
 
       setLoading(false)
     }
-  }, [authToken, getConfigBaseUrl])
+  }, [authToken, getConfigBaseUrl, buildFormData])
 
   const clearResponse = useCallback(() => {
     setResponseData(null)
