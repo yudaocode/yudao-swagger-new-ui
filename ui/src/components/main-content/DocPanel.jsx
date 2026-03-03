@@ -35,19 +35,32 @@ function DocPanel({
                 <React.Fragment key={paramType}>
                   <div className="param-type-header">{paramType}</div>
                   {params.map((param, idx) => (
-                    <div key={idx} className="param-row">
-                      <div className="param-col-left">
-                        <span className="param-name">
-                          {param.name}
-                          {param.required && <span className="required">*</span>}
-                        </span>
-                        <span className="param-type">{param.schema?.type || 'string'}</span>
+                    <React.Fragment key={idx}>
+                      {/* Parameter header row */}
+                      <div className="param-row">
+                        <div className="param-col-left">
+                          <span className="param-name">
+                            {param.name}
+                            {param.required && <span className="required">*</span>}
+                          </span>
+                          <span className="param-type">
+                            {param.resolvedSchema?.$ref
+                              ? param.resolvedSchema.$ref.replace('#/components/schemas/', '')
+                              : param.resolvedSchema?.type || 'string'}
+                          </span>
+                        </div>
+                        <div className="param-col-right">
+                          <span className="param-desc">{param.description || ''}</span>
+                          {param.required && <span className="param-meta">required</span>}
+                        </div>
                       </div>
-                      <div className="param-col-right">
-                        <span className="param-desc">{param.description || ''}</span>
-                        {param.required && <span className="param-meta">required</span>}
-                      </div>
-                    </div>
+                      {/* If parameter has a complex schema, show its properties */}
+                      {param.resolvedSchema && (param.resolvedSchema.properties || param.resolvedSchema.$ref) && (
+                        <div className="param-schema-nested">
+                          <SchemaViewer schema={param.resolvedSchema} />
+                        </div>
+                      )}
+                    </React.Fragment>
                   ))}
                 </React.Fragment>
               ))}

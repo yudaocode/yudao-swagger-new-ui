@@ -54,8 +54,17 @@ function MainContent({ endpoint, operation, apiData, theme, onToggleTheme, authT
   }, [requestBodySchema, getSchemaExample])
 
   const parameters = op?.parameters || []
+
+  // Resolve parameter schemas
+  const resolvedParameters = useMemo(() => {
+    return parameters.map(param => ({
+      ...param,
+      resolvedSchema: resolveSchema(param.schema),
+    }))
+  }, [parameters, resolveSchema])
+
   const groupedParams = useMemo(() => {
-    return parameters.reduce((acc, param) => {
+    return resolvedParameters.reduce((acc, param) => {
       const type = param.in || 'query'
       if (!acc[type]) {
         acc[type] = []
@@ -63,7 +72,7 @@ function MainContent({ endpoint, operation, apiData, theme, onToggleTheme, authT
       acc[type].push(param)
       return acc
     }, {})
-  }, [parameters])
+  }, [resolvedParameters])
 
   // Track previous operation to reset values only when operation changes
   const prevOperationRef = useRef(null)
