@@ -54,7 +54,7 @@ function Sidebar({ endpoints, selectedEndpoint, onSelectEndpoint, apiInfo, width
           <input
             type="text"
             className="search-input"
-            placeholder="/api/v1/..."
+            placeholder="Search API ..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
