@@ -6,7 +6,7 @@
 
     <groupId>coget.cn</groupId>
     <artifactId>yudao-swagger-ui</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>${revision}</version>
     <packaging>pom</packaging>
 
     <modules>
@@ -19,6 +19,24 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        
+        <!-- 版本号统一管理 -->
+        <revision>1.0-RELEASE</revision>
+        
+        <!-- Spring Boot 版本 -->
+        <spring-boot2.version>2.7.18</spring-boot2.version>
+        <spring-boot3.version>3.2.0</spring-boot3.version>
+        
+        <!-- SpringDoc 版本 -->
+        <springdoc-boot2.version>1.7.0</springdoc-boot2.version>
+        <springdoc-boot3.version>2.3.0</springdoc-boot3.version>
+        
+        <!-- Jackson 版本 -->
+        <jackson-boot2.version>2.13.5</jackson-boot2.version>
+        <jackson-boot3.version>2.15.0</jackson-boot3.version>
+        
+        <!-- 其他依赖版本 -->
+        <lombok.version>1.18.24</lombok.version>
     </properties>
 
     <repositories>
@@ -33,6 +51,56 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository>
+        <repository>
+            <id>maven-releases</id>
+            <url>https://repo.gitcode.com/repository/maven-releases/</url>
+        </repository>
+        <repository>
+            <id>maven-snapshot</id>
+            <url>https://repo.gitcode.com/repository/maven-snapshots/</url>
+        </repository>
     </repositories>
+
+    <distributionManagement>
+        <repository>
+            <id>maven-releases</id>
+            <url>https://repo.gitcode.com/repository/maven-releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>maven-snapshots</id>
+            <url>https://repo.gitcode.com/repository/maven-snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+    <build>
+        <plugins>
+            <!-- flatten plugin 用于正确处理 ${revision} 等 CI-friendly 版本变量 -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
+                <version>1.5.0</version>
+                <configuration>
+                    <updatePomFile>true</updatePomFile>
+                    <flattenMode>resolveCiFriendliesOnly</flattenMode>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>flatten</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>flatten</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>flatten.clean</id>
+                        <phase>clean</phase>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

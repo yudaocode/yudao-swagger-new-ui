@@ -7,21 +7,17 @@
     <parent>
         <groupId>coget.cn</groupId>
         <artifactId>examples</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>${revision}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>yudao-swagger-ui-spring-boot2-example</artifactId>
 
-    <properties>
-        <spring-boot.version>2.7.18</spring-boot.version>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-            <version>${spring-boot.version}</version>
+            <version>${spring-boot2.version}</version>
         </dependency>
         <dependency>
             <groupId>coget.cn</groupId>
@@ -31,12 +27,12 @@
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-webmvc-core</artifactId>
-            <version>1.7.0</version>
+            <version>${springdoc-boot2.version}</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.24</version>
+            <version>${lombok.version}</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
@@ -46,7 +42,7 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>${spring-boot.version}</version>
+                <version>${spring-boot2.version}</version>
             </plugin>
         </plugins>
     </build>
