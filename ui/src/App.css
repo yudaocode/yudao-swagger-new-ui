@@ -512,8 +512,10 @@
   background-color: var(--surface-bg);
   border-radius: var(--radius-sm);
   padding: 12px;
-  max-height: 300px;
+  max-height: 600px;
+  min-height: 100px;
   overflow-y: auto;
+  resize: vertical;
 }
 
 /* Params Input Section */
