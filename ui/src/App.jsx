@@ -5,7 +5,11 @@ import MainContent from './components/MainContent'
 import SettingsModal from './components/SettingsModal'
 
 function App() {
-  const [selectedEndpoint, setSelectedEndpoint] = useState(null)
+  // 从 URL 参数中读取初始选中的 endpoint
+  const [selectedEndpoint, setSelectedEndpoint] = useState(() => {
+    const urlParams = new URLSearchParams(window.location.search)
+    return urlParams.get('endpoint') || null
+  })
   const [theme, setTheme] = useState(() => {
     return localStorage.getItem('theme') || 'dark'
   })
@@ -13,7 +17,7 @@ function App() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [sidebarWidth, setSidebarWidth] = useState(() => {
-    return parseInt(localStorage.getItem('sidebarWidth')) || 280
+    return parseInt(localStorage.getItem('sidebarWidth')) || 320
   })
   const [isDragging, setIsDragging] = useState(false)
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
@@ -28,12 +32,30 @@ function App() {
   })
   const [groups, setGroups] = useState([])
   const [selectedGroup, setSelectedGroup] = useState(() => {
-    return localStorage.getItem('selectedGroup') || 'default'
+    const urlParams = new URLSearchParams(window.location.search)
+    return urlParams.get('group') || localStorage.getItem('selectedGroup') || 'default'
   })
   const dragStartX = useRef(0)
   const dragStartWidth = useRef(0)
   const hasFetchedGroups = useRef(false)
   const lastFetchedGroup = useRef(null)
+
+  // 当 selectedEndpoint 或 selectedGroup 变化时，更新 URL 参数
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search)
+    if (selectedEndpoint) {
+      urlParams.set('endpoint', selectedEndpoint)
+    } else {
+      urlParams.delete('endpoint')
+    }
+    if (selectedGroup && selectedGroup !== 'default') {
+      urlParams.set('group', selectedGroup)
+    } else {
+      urlParams.delete('group')
+    }
+    const newUrl = `${window.location.pathname}${urlParams.toString() ? '?' + urlParams.toString() : ''}${window.location.hash}`
+    window.history.replaceState(null, '', newUrl)
+  }, [selectedEndpoint, selectedGroup])
 
   const getConfig = useCallback(() => {
     const urlParams = new URLSearchParams(window.location.search)
@@ -109,8 +131,13 @@ function App() {
         console.log('Groups loaded:', groupsData)
         setGroups(groupsData)
 
+        const urlParams = new URLSearchParams(window.location.search)
+        const urlGroup = urlParams.get('group')
         const savedGroup = localStorage.getItem('selectedGroup')
-        if (savedGroup && groupsData.some(g => g.name === savedGroup)) {
+        // 优先使用 URL 中的 group 参数
+        if (urlGroup && groupsData.some(g => g.name === urlGroup)) {
+          setSelectedGroup(urlGroup)
+        } else if (savedGroup && groupsData.some(g => g.name === savedGroup)) {
           setSelectedGroup(savedGroup)
         } else if (groupsData.length > 0) {
           setSelectedGroup(groupsData[0].name)
@@ -165,7 +192,7 @@ function App() {
       }
       const data = await response.json()
       setApiData(data)
-      setSelectedEndpoint(null)
+      // 不重置 selectedEndpoint，保持 URL 中的选中状态
     } catch (err) {
       console.error('Failed to fetch API docs:', err)
       setError(err.message)
@@ -233,9 +260,20 @@ function App() {
   const endpoints = parseEndpoints(apiData)
 
   useEffect(() => {
-    if (endpoints.length > 0 && !selectedEndpoint) {
-      const first = endpoints[0]
-      setSelectedEndpoint(`${first.method} ${first.path}`)
+    if (endpoints.length > 0) {
+      // 如果 URL 中有 endpoint 参数，检查它是否存在于 endpoints 中
+      if (selectedEndpoint) {
+        const endpointExists = endpoints.some(ep => `${ep.method} ${ep.path}` === selectedEndpoint)
+        if (!endpointExists) {
+          // 如果 URL 中的 endpoint 不存在，则选中第一个
+          const first = endpoints[0]
+          setSelectedEndpoint(`${first.method} ${first.path}`)
+        }
+      } else {
+        // 如果没有选中的 endpoint，选中第一个
+        const first = endpoints[0]
+        setSelectedEndpoint(`${first.method} ${first.path}`)
+      }
     }
   }, [endpoints, selectedEndpoint])
 
