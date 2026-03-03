@@ -14,6 +14,18 @@
   --accent-info: #{$accent-info};
   --accent-warning: #{$accent-warning};
   --accent-error: #{$accent-error};
+
+  /* Code Highlight Colors - Dark Theme (One Dark Pro) */
+  --hljs-keyword: #{$dark-hljs-keyword};
+  --hljs-string: #{$dark-hljs-string};
+  --hljs-number: #{$dark-hljs-number};
+  --hljs-comment: #{$dark-hljs-comment};
+  --hljs-function: #{$dark-hljs-function};
+  --hljs-variable: #{$dark-hljs-variable};
+  --hljs-operator: #{$dark-hljs-operator};
+  --hljs-class: #{$dark-hljs-class};
+  --hljs-property: #{$dark-hljs-property};
+  --hljs-builtin: #{$dark-hljs-builtin};
 }
 
 @mixin light-theme {
@@ -30,6 +42,18 @@
   --accent-info: #{$light-accent-info};
   --accent-warning: #{$light-accent-warning};
   --accent-error: #{$light-accent-error};
+
+  /* Code Highlight Colors - Light Theme (GitHub Style) */
+  --hljs-keyword: #{$light-hljs-keyword};
+  --hljs-string: #{$light-hljs-string};
+  --hljs-number: #{$light-hljs-number};
+  --hljs-comment: #{$light-hljs-comment};
+  --hljs-function: #{$light-hljs-function};
+  --hljs-variable: #{$light-hljs-variable};
+  --hljs-operator: #{$light-hljs-operator};
+  --hljs-class: #{$light-hljs-class};
+  --hljs-property: #{$light-hljs-property};
+  --hljs-builtin: #{$light-hljs-builtin};
 }
 
 :root {

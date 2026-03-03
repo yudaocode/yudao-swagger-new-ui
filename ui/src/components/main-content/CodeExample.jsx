@@ -41,8 +41,14 @@ function CodeExample({
   // Apply syntax highlighting after render
   useEffect(() => {
     if (codeRef.current && currentCode) {
+      // Reset the element
       codeRef.current.removeAttribute('data-highlighted')
       codeRef.current.className = `language-${langMap[activeLang]}`
+      
+      // Set text content directly to avoid HTML injection issues
+      codeRef.current.textContent = currentCode
+      
+      // Apply highlighting
       hljs.highlightElement(codeRef.current)
     }
   }, [activeLang, currentCode])
@@ -74,9 +80,7 @@ function CodeExample({
           <code
             ref={codeRef}
             className={`language-${langMap[activeLang]}`}
-          >
-            {currentCode}
-          </code>
+          />
         </pre>
       </div>
     </div>

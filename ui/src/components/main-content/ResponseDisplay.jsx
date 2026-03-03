@@ -61,9 +61,7 @@ function ResponseDisplay({ responseData, onCopy, copySuccess }) {
             responseData.error ? (
               responseData.message
             ) : (
-              <code ref={codeRef} className="language-json">
-                {formattedJson}
-              </code>
+              <code ref={codeRef} className="language-json" />
             )
           ) : (
             <span className="response-placeholder">Click "send request" to see the response</span>

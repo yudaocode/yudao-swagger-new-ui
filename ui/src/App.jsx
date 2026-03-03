@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import './App.css'
+import './styles/App.scss'
 import Sidebar from './components/Sidebar'
 import MainContent from './components/MainContent'
 import SettingsModal from './components/SettingsModal'
@@ -27,6 +27,8 @@ function App() {
   })
   const dragStartX = useRef(0)
   const dragStartWidth = useRef(0)
+  const hasFetchedGroups = useRef(false)
+  const lastFetchedGroup = useRef(null)
 
   useEffect(() => {
     if (theme === 'light') {
@@ -46,11 +48,17 @@ function App() {
   }, [authToken])
 
   useEffect(() => {
-    fetchGroups()
+    // Prevent duplicate fetches in React 18 Strict Mode
+    if (!hasFetchedGroups.current) {
+      hasFetchedGroups.current = true
+      fetchGroups()
+    }
   }, [])
 
   useEffect(() => {
-    if (groups.length > 0) {
+    // Only fetch if groups are loaded and we haven't fetched this group yet
+    if (groups.length > 0 && lastFetchedGroup.current !== selectedGroup) {
+      lastFetchedGroup.current = selectedGroup
       fetchApiData()
     }
   }, [selectedGroup, groups])
