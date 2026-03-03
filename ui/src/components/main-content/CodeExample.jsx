@@ -4,17 +4,22 @@ import bash from 'highlight.js/lib/languages/bash'
 import javascript from 'highlight.js/lib/languages/javascript'
 import python from 'highlight.js/lib/languages/python'
 import java from 'highlight.js/lib/languages/java'
+import go from 'highlight.js/lib/languages/go'
 
 hljs.registerLanguage('bash', bash)
 hljs.registerLanguage('javascript', javascript)
 hljs.registerLanguage('python', python)
 hljs.registerLanguage('java', java)
+hljs.registerLanguage('go', go)
+
+const LANGUAGES = ['curl', 'java', 'go', 'python', 'nodejs']
 
 const langMap = {
   curl: 'bash',
-  nodejs: 'javascript',
-  python: 'python',
   java: 'java',
+  go: 'go',
+  python: 'python',
+  nodejs: 'javascript',
 }
 
 /**
@@ -46,7 +51,7 @@ function CodeExample({
     <div className="code-section">
       {/* Language Tabs */}
       <div className="lang-tabs">
-        {['curl', 'nodejs', 'python', 'java'].map(lang => (
+        {LANGUAGES.map(lang => (
           <button
             key={lang}
             className={`lang-tab ${activeLang === lang ? 'active' : ''}`}
@@ -94,7 +99,7 @@ export function useCodeExamples({
 }) {
   return useMemo(() => {
     if (!path || !method) {
-      return { curl: '', java: '', nodejs: '', python: '' }
+      return { curl: '', java: '', go: '', nodejs: '', python: '' }
     }
 
     const getBaseUrl = () => {
@@ -173,21 +178,39 @@ public class ApiRequest {
     }
 }`
 
-    const nodejs = `const fetch = require('node-fetch');
+    const go = `package main
 
-const url = "${url}${queryString}";
-const options = {
-  method: '${method.toUpperCase()}',
-  headers: {
-${Object.entries(requestHeaders).map(([k, v]) => `    '${k}': '${v}'`).join(',\n')}
-  }${requestBodySchema ? `,
-  body: ${JSON.stringify(requestBody)}` : ''}
-};
+import (
+    "bytes"
+    "encoding/json"
+    "fmt"
+    "io"
+    "net/http"
+)
 
-fetch(url, options)
-  .then(res => res.json())
-  .then(json => console.log(json))
-  .catch(err => console.error('error:' + err));`
+func main() {
+    url := "${url}${queryString}"
+${requestBodySchema ? `    payload := []byte(\`${requestBody}\`)` : ''}
+
+    client := &http.Client{}
+    ${requestBodySchema ? `req, err := http.NewRequest("${method.toUpperCase()}", url, bytes.NewBuffer(payload))` : `req, err := http.NewRequest("${method.toUpperCase()}", url, nil)`}
+    if err != nil {
+        panic(err)
+    }
+
+${Object.entries(requestHeaders).map(([k, v]) => `    req.Header.Set("${k}", "${v}")`).join('\n')}
+
+    resp, err := client.Do(req)
+    if err != nil {
+        panic(err)
+    }
+    defer resp.Body.Close()
+
+    body, _ := io.ReadAll(resp.Body)
+    var result map[string]interface{}
+    json.Unmarshal(body, &result)
+    fmt.Println(result)
+}`
 
     const python = `import requests
 
@@ -207,7 +230,23 @@ response = requests.${method.toLowerCase()}(
 print(response.status_code)
 print(response.json())`
 
-    return { curl, java, nodejs, python }
+    const nodejs = `const fetch = require('node-fetch');
+
+const url = "${url}${queryString}";
+const options = {
+  method: '${method.toUpperCase()}',
+  headers: {
+${Object.entries(requestHeaders).map(([k, v]) => `    '${k}': '${v}'`).join(',\n')}
+  }${requestBodySchema ? `,
+  body: ${JSON.stringify(requestBody)}` : ''}
+};
+
+fetch(url, options)
+  .then(res => res.json())
+  .then(json => console.log(json))
+  .catch(err => console.error('error:' + err));`
+
+    return { curl, java, go, nodejs, python }
   }, [method, path, requestBody, paramValues, groupedParams, apiData, requestBodySchema, op, authToken])
 }
 
