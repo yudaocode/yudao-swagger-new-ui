@@ -22,39 +22,39 @@ public class SwaggerConfig {
                                 .email("example@example.com")));
     }
 
-//    /**
-//     * 用户 API 分组
-//     * 包含用户管理相关的接口
-//     */
-//    @Bean
-//    public GroupedOpenApi userApi() {
-//        return GroupedOpenApi.builder()
-//                .group("用户API")
-//                .pathsToMatch("/api/users/**")
-//                .build();
-//    }
-//
-//    /**
-//     * 订单 API 分组
-//     * 包含订单管理相关的接口
-//     */
-//    @Bean
-//    public GroupedOpenApi orderApi() {
-//        return GroupedOpenApi.builder()
-//                .group("订单API")
-//                .pathsToMatch("/api/orders/**")
-//                .build();
-//    }
-//
-//    /**
-//     * 商品 API 分组
-//     * 包含商品管理相关的接口
-//     */
-//    @Bean
-//    public GroupedOpenApi productApi() {
-//        return GroupedOpenApi.builder()
-//                .group("商品API")
-//                .pathsToMatch("/api/products/**")
-//                .build();
-//    }
+    /**
+     * 用户 API 分组
+     * 包含用户管理相关的接口
+     */
+    @Bean
+    public GroupedOpenApi userApi() {
+        return GroupedOpenApi.builder()
+                .group("用户API")
+                .pathsToMatch("/api/users/**")
+                .build();
+    }
+
+    /**
+     * 订单 API 分组
+     * 包含订单管理相关的接口
+     */
+    @Bean
+    public GroupedOpenApi orderApi() {
+        return GroupedOpenApi.builder()
+                .group("订单API")
+                .pathsToMatch("/api/orders/**")
+                .build();
+    }
+
+    /**
+     * 商品 API 分组
+     * 包含商品管理相关的接口
+     */
+    @Bean
+    public GroupedOpenApi productApi() {
+        return GroupedOpenApi.builder()
+                .group("商品API")
+                .pathsToMatch("/api/products/**")
+                .build();
+    }
 }
