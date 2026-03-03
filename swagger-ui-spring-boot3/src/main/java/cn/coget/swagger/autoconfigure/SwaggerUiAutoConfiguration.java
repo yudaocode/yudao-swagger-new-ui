@@ -2,7 +2,7 @@ package cn.coget.swagger.autoconfigure;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springdoc.core.GroupedOpenApi;
+import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
@@ -51,11 +51,11 @@ public class SwaggerUiAutoConfiguration implements WebMvcConfigurer {
 
     /**
      * 从 groupsApiPath 中提取静态资源路径
-     * 例如: "/swagger-new-ui/groups" -> "/swagger-new-ui"
+     * 例如: "/swagger-ui/groups" -> "/swagger-ui"
      */
     private String extractStaticPath(String groupsApiPath) {
         if (groupsApiPath == null || groupsApiPath.isEmpty()) {
-            return "/swagger-new-ui";
+            return "/swagger-ui";
         }
         int lastSlash = groupsApiPath.lastIndexOf('/');
         if (lastSlash > 0) {

@@ -1,0 +1,24 @@
+package cn.coget.examples.dto;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+
+@Data
+@Schema(description = "用户创建请求")
+public class UserCreateDTO {
+
+    @Schema(description = "用户名", required = true, example = "zhangsan")
+    private String username;
+
+    @Schema(description = "密码", required = true, example = "123456")
+    private String password;
+
+    @Schema(description = "邮箱", example = "zhangsan@example.com")
+    private String email;
+
+    @Schema(description = "手机号", example = "13800138000")
+    private String phone;
+
+    @Schema(description = "年龄", example = "25")
+    private Integer age;
+}

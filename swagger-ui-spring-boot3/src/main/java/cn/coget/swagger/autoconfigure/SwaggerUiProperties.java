@@ -5,18 +5,18 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import java.util.HashMap;
 import java.util.Map;
 
-@ConfigurationProperties(prefix = "swagger-new-ui")
+@ConfigurationProperties(prefix = "swagger-ui")
 public class SwaggerUiProperties {
 
     /**
      * Swagger UI HTML 页面路径
      */
-    private String htmlPath = "/swagger-new-ui.html";
+    private String htmlPath = "/swagger-ui.html";
 
     /**
      * 分组 API 路径
      */
-    private String groupsApiPath = "/swagger-new-ui/groups";
+    private String groupsApiPath = "/swagger-ui/groups";
 
     /**
      * Swagger UI 的基础 URL 路径
