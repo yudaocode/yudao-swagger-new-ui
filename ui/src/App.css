@@ -536,7 +536,12 @@
 .code-box .hljs-selector-tag,
 .code-box .hljs-built_in,
 .code-box .hljs-name,
-.code-box .hljs-tag {
+.code-box .hljs-tag,
+.response-display-box .hljs-keyword,
+.response-display-box .hljs-selector-tag,
+.response-display-box .hljs-built_in,
+.response-display-box .hljs-name,
+.response-display-box .hljs-tag {
   color: var(--hljs-keyword);
 }
 
@@ -547,57 +552,85 @@
 .code-box .hljs-literal,
 .code-box .hljs-template-tag,
 .code-box .hljs-template-variable,
-.code-box .hljs-type {
+.code-box .hljs-type,
+.response-display-box .hljs-string,
+.response-display-box .hljs-title,
+.response-display-box .hljs-section,
+.response-display-box .hljs-attribute,
+.response-display-box .hljs-literal,
+.response-display-box .hljs-template-tag,
+.response-display-box .hljs-template-variable,
+.response-display-box .hljs-type {
   color: var(--hljs-string);
 }
 
 .code-box .hljs-number,
 .code-box .hljs-regexp,
-.code-box .hljs-link {
+.code-box .hljs-link,
+.response-display-box .hljs-number,
+.response-display-box .hljs-regexp,
+.response-display-box .hljs-link {
   color: var(--hljs-number);
 }
 
 .code-box .hljs-comment,
 .code-box .hljs-quote,
-.code-box .hljs-meta {
+.code-box .hljs-meta,
+.response-display-box .hljs-comment,
+.response-display-box .hljs-quote,
+.response-display-box .hljs-meta {
   color: var(--hljs-comment);
 }
 
 .code-box .hljs-function,
 .code-box .hljs-selector-id,
-.code-box .hljs-selector-class {
+.code-box .hljs-selector-class,
+.response-display-box .hljs-function,
+.response-display-box .hljs-selector-id,
+.response-display-box .hljs-selector-class {
   color: var(--hljs-function);
 }
 
 .code-box .hljs-variable,
-.code-box .hljs-params {
+.code-box .hljs-params,
+.response-display-box .hljs-variable,
+.response-display-box .hljs-params {
   color: var(--hljs-variable);
 }
 
 .code-box .hljs-operator,
-.code-box .hljs-bullet {
+.code-box .hljs-bullet,
+.response-display-box .hljs-operator,
+.response-display-box .hljs-bullet {
   color: var(--hljs-operator);
 }
 
 .code-box .hljs-class .hljs-title,
-.code-box .hljs-title.class_ {
+.code-box .hljs-title.class_,
+.response-display-box .hljs-class .hljs-title,
+.response-display-box .hljs-title.class_ {
   color: var(--hljs-class);
 }
 
 .code-box .hljs-property,
-.code-box .hljs-attr {
+.code-box .hljs-attr,
+.response-display-box .hljs-property,
+.response-display-box .hljs-attr {
   color: var(--hljs-property);
 }
 
-.code-box .hljs-built_in {
+.code-box .hljs-built_in,
+.response-display-box .hljs-built_in {
   color: var(--hljs-builtin);
 }
 
-.code-box .hljs-addition {
+.code-box .hljs-addition,
+.response-display-box .hljs-addition {
   color: var(--accent-green);
 }
 
-.code-box .hljs-deletion {
+.code-box .hljs-deletion,
+.response-display-box .hljs-deletion {
   color: var(--accent-error);
 }
 

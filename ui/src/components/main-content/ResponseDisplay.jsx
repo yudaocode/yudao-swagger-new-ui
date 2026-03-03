@@ -1,14 +1,31 @@
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
+import hljs from 'highlight.js/lib/core'
+import json from 'highlight.js/lib/languages/json'
+
+hljs.registerLanguage('json', json)
 
 /**
  * 响应结果展示组件
  */
 function ResponseDisplay({ responseData, onCopy, copySuccess }) {
-  if (!responseData) return null
+  const codeRef = useRef(null)
 
   const formatJson = (obj) => {
     return JSON.stringify(obj, null, 2)
   }
+
+  // Apply syntax highlighting when response data changes
+  useEffect(() => {
+    if (codeRef.current && responseData && !responseData.error) {
+      const jsonStr = formatJson(responseData.data)
+      codeRef.current.textContent = jsonStr
+      codeRef.current.removeAttribute('data-highlighted')
+      codeRef.current.className = 'language-json'
+      hljs.highlightElement(codeRef.current)
+    }
+  }, [responseData])
+
+  if (!responseData) return null
 
   return (
     <div className="response-display">
@@ -29,9 +46,11 @@ function ResponseDisplay({ responseData, onCopy, copySuccess }) {
       </div>
       <div className="response-display-box">
         <pre className="code-block">
-          {responseData.error
-            ? responseData.message
-            : formatJson(responseData.data)}
+          {responseData.error ? (
+            responseData.message
+          ) : (
+            <code ref={codeRef} className="language-json"></code>
+          )}
         </pre>
       </div>
     </div>
