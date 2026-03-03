@@ -29,6 +29,8 @@ function TryItPanel({
   onSendRequest,
   onCopyResponse,
   responseCopySuccess,
+  validationError,
+  onClearValidationError,
 }) {
   const [activeLang, setActiveLang] = useState('curl')
   const [copySuccess, setCopySuccess] = useState(false)
@@ -94,6 +96,22 @@ function TryItPanel({
             value={requestBody}
             onChange={(e) => onRequestBodyChange(e.target.value)}
           />
+        </div>
+      )}
+
+      {/* Validation Error */}
+      {validationError && (
+        <div className="validation-error">
+          <div className="validation-error-header">
+            <span className="validation-error-title">参数校验失败</span>
+            <button
+              className="validation-error-close"
+              onClick={onClearValidationError}
+            >
+              ×
+            </button>
+          </div>
+          <pre className="validation-error-message">{validationError}</pre>
         </div>
       )}
 

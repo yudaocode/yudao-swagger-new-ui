@@ -63,6 +63,65 @@ function buildRequestParams(paramValues, params, resolveSchema) {
 }
 
 /**
+ * 校验必填参数
+ * 返回错误信息数组，校验通过返回空数组
+ */
+function validateRequiredParams(paramValues, params, resolveSchema, requestBody, requestBodySchema, op) {
+  const errors = []
+
+  // 校验普通参数
+  params.forEach(param => {
+    const paramType = param.in || 'query'
+    const resolvedSchema = resolveSchema(param.schema)
+
+    if (param.required) {
+      if (resolvedSchema?.properties) {
+        // 复杂类型对象参数，校验其必填属性
+        const requiredProps = resolvedSchema.required || []
+        requiredProps.forEach(propName => {
+          const key = `${paramType}_${param.name}.${propName}`
+          const value = paramValues[key]
+          if (value === undefined || value === '' || value === null) {
+            errors.push(`参数 ${param.name}.${propName} (${paramType}) 是必填项`)
+          }
+        })
+      } else {
+        // 简单类型参数
+        const key = `${paramType}_${param.name}`
+        const value = paramValues[key]
+        if (value === undefined || value === '' || value === null) {
+          errors.push(`参数 ${param.name} (${paramType}) 是必填项`)
+        }
+      }
+    }
+  })
+
+  // 校验 request body
+  if (op?.requestBody?.required) {
+    if (!requestBody || requestBody.trim() === '') {
+      errors.push('request body 是必填项')
+    } else {
+      // 尝试解析 JSON，检查是否有效
+      try {
+        const parsed = JSON.parse(requestBody)
+        // 如果有 schema，校验必填字段
+        if (requestBodySchema?.required) {
+          requestBodySchema.required.forEach(requiredField => {
+            if (parsed[requiredField] === undefined || parsed[requiredField] === null || parsed[requiredField] === '') {
+              errors.push(`request body 中的字段 ${requiredField} 是必填项`)
+            }
+          })
+        }
+      } catch (e) {
+        errors.push('request body 不是有效的 JSON 格式')
+      }
+    }
+  }
+
+  return errors
+}
+
+/**
  * 主内容组件
  * 展示 API 端点的详细信息和测试功能
  */
@@ -72,6 +131,7 @@ function MainContent({ endpoint, operation, apiData, theme, onToggleTheme, authT
     requestBody: false,
   })
   const [responseCopySuccess, setResponseCopySuccess] = useState(false)
+  const [validationError, setValidationError] = useState(null)
 
   // Use custom hooks
   const { resolveSchema, getSchemaExample } = useSchemaResolver(apiData)
@@ -181,6 +241,24 @@ function MainContent({ endpoint, operation, apiData, theme, onToggleTheme, authT
   }
 
   const handleSendRequest = () => {
+    // 清除之前的校验错误
+    setValidationError(null)
+
+    // 校验必填参数
+    const errors = validateRequiredParams(
+      paramValues,
+      parameters,
+      resolveSchema,
+      requestBody,
+      requestBodySchema,
+      op
+    )
+
+    if (errors.length > 0) {
+      setValidationError(errors.join('\n'))
+      return
+    }
+
     // Build request params from nested param values
     const requestParams = buildRequestParams(paramValues, parameters, resolveSchema)
 
@@ -335,6 +413,8 @@ function MainContent({ endpoint, operation, apiData, theme, onToggleTheme, authT
           onSendRequest={handleSendRequest}
           onCopyResponse={handleCopyResponse}
           responseCopySuccess={responseCopySuccess}
+          validationError={validationError}
+          onClearValidationError={() => setValidationError(null)}
         />
       </div>
     </main>
