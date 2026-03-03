@@ -3,8 +3,7 @@
 UI_DIR="ui"
 BUILD_DIR="$UI_DIR/dist"
 TARGET_DIRS=(
-    "swagger-ui-spring-boot2/src/main/resources/static"
-    "swagger-ui-spring-boot3/src/main/resources/static"
+    "yudao-swagger-new-ui-boot-starter/src/main/resources/static"
 )
 
 echo "Building React project for Java..."
