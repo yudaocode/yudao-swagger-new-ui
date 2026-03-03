@@ -45,9 +45,9 @@ function DocPanel({
           </div>
           {!collapsedSections.parameters && (
             <div className="params-table">
-              {Object.entries(groupedParams).map(([paramType, params]) => (
+              {Object.entries(groupedParams).map(([paramType, params], index) => (
                 <React.Fragment key={paramType}>
-                  <div className="param-type-header">{paramType}</div>
+                  <div className={`param-type-header${index === 0 ? ' first-param-type-header' : ''}`}>{paramType}</div>
                   {params.map((param, idx) => (
                     <React.Fragment key={idx}>
                       {/* Parameter header row */}
