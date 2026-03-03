@@ -301,7 +301,7 @@ function App() {
   const handleDragMove = (e) => {
     if (!isDragging) return
     const deltaX = e.clientX - dragStartX.current
-    const newWidth = Math.max(200, Math.min(500, dragStartWidth.current + deltaX))
+    const newWidth = Math.max(200, Math.min(600, dragStartWidth.current + deltaX))
     setSidebarWidth(newWidth)
   }
 
