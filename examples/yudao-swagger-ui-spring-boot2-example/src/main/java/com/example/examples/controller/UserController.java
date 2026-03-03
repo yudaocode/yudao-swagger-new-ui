@@ -15,11 +15,15 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Tag(name = "用户管理")
 @RestController
@@ -192,5 +196,54 @@ public class UserController {
         return ResponseEntity.ok()
                 .header("Content-Disposition", "attachment; filename=users." + format)
                 .body("id,username,email\n1,admin,admin@example.com\n2,user,user@example.com");
+    }
+
+    @Operation(summary = "上传头像", description = "上传用户头像图片")
+    @PostMapping(value = "/{id}/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public Result<Map<String, Object>> uploadAvatar(
+            @Parameter(description = "用户ID", required = true) @PathVariable Long id,
+            @Parameter(description = "头像文件", required = true)
+            @RequestPart("file") MultipartFile file) {
+        Map<String, Object> result = new HashMap<>();
+        result.put("userId", id);
+        result.put("fileName", file.getOriginalFilename());
+        result.put("fileSize", file.getSize());
+        result.put("contentType", file.getContentType());
+        result.put("url", "/uploads/avatars/" + id + "/" + file.getOriginalFilename());
+        return Result.success(result);
+    }
+
+    @Operation(summary = "上传多个文件", description = "批量上传文件")
+    @PostMapping(value = "/upload-files", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public Result<List<Map<String, Object>>> uploadFiles(
+            @Parameter(description = "文件列表", required = true)
+            @RequestPart("files") MultipartFile[] files,
+            @Parameter(description = "文件类型") @RequestParam(required = false) String type) {
+        List<Map<String, Object>> results = new ArrayList<>();
+        for (MultipartFile file : files) {
+            Map<String, Object> info = new HashMap<>();
+            info.put("fileName", file.getOriginalFilename());
+            info.put("fileSize", file.getSize());
+            info.put("contentType", file.getContentType());
+            results.add(info);
+        }
+        return Result.success(results);
+    }
+
+    @Operation(summary = "上传文件和表单数据", description = "同时上传文件和提交表单数据")
+    @PostMapping(value = "/upload-with-data", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public Result<Map<String, Object>> uploadWithData(
+            @Parameter(description = "文件", required = true)
+            @RequestPart("file") MultipartFile file,
+            @Parameter(description = "用户名") @RequestParam String username,
+            @Parameter(description = "邮箱") @RequestParam(required = false) String email,
+            @Parameter(description = "是否公开") @RequestParam(defaultValue = "false") Boolean isPublic) {
+        Map<String, Object> result = new HashMap<>();
+        result.put("fileName", file.getOriginalFilename());
+        result.put("fileSize", file.getSize());
+        result.put("username", username);
+        result.put("email", email);
+        result.put("isPublic", isPublic);
+        return Result.success(result);
     }
 }
