@@ -2,9 +2,9 @@ package cn.coget.swagger.autoconfigure;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
@@ -33,10 +33,13 @@ public class SwaggerUiAutoConfiguration implements WebMvcConfigurer {
 
     private final SwaggerUiProperties properties;
     private final ObjectMapper objectMapper;
+    private final ApplicationContext applicationContext;
 
-    public SwaggerUiAutoConfiguration(SwaggerUiProperties properties, ObjectMapper objectMapper) {
+    public SwaggerUiAutoConfiguration(SwaggerUiProperties properties, ObjectMapper objectMapper, 
+                                      ApplicationContext applicationContext) {
         this.properties = properties;
         this.objectMapper = objectMapper;
+        this.applicationContext = applicationContext;
     }
 
     @Override
@@ -146,8 +149,7 @@ public class SwaggerUiAutoConfiguration implements WebMvcConfigurer {
      * SpringDoc 2.x: org.springdoc.core.models.GroupedOpenApi
      */
     @Bean
-    public RouterFunction<ServerResponse> swaggerGroupsRouter(
-            @Autowired(required = false) List<?> groupedOpenApis) {
+    public RouterFunction<ServerResponse> swaggerGroupsRouter() {
         String groupsPath = properties.getGroupsApiPath();
         return route(GET(groupsPath), request -> {
             List<Map<String, String>> groups = new ArrayList<>();
@@ -159,17 +161,17 @@ public class SwaggerUiAutoConfiguration implements WebMvcConfigurer {
             defaultGroup.put("url", properties.getApiPath());
             groups.add(defaultGroup);
             
-            // 添加用户定义的分组（通过反射兼容不同版本的 SpringDoc）
-            if (groupedOpenApis != null) {
-                for (Object groupedOpenApi : groupedOpenApis) {
-                    String group = getGroupFromGroupedOpenApi(groupedOpenApi);
-                    if (group != null) {
-                        Map<String, String> groupInfo = new HashMap<>();
-                        groupInfo.put("name", group);
-                        groupInfo.put("displayName", group);
-                        groupInfo.put("url", properties.getApiPath() + "/" + group);
-                        groups.add(groupInfo);
-                    }
+            // 通过 ApplicationContext 动态获取 GroupedOpenApi Bean
+            // 兼容 SpringDoc 1.x 和 2.x 的不同包名
+            List<Object> groupedOpenApis = getGroupedOpenApiBeans();
+            for (Object groupedOpenApi : groupedOpenApis) {
+                String group = getGroupFromGroupedOpenApi(groupedOpenApi);
+                if (group != null) {
+                    Map<String, String> groupInfo = new HashMap<>();
+                    groupInfo.put("name", group);
+                    groupInfo.put("displayName", group);
+                    groupInfo.put("url", properties.getApiPath() + "/" + group);
+                    groups.add(groupInfo);
                 }
             }
             
@@ -184,6 +186,36 @@ public class SwaggerUiAutoConfiguration implements WebMvcConfigurer {
                     .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
                     .body(groupsJson);
         });
+    }
+
+    /**
+     * 从 ApplicationContext 获取所有 GroupedOpenApi Bean
+     * 兼容 SpringDoc 1.x 和 2.x 的不同包名
+     * 
+     * @return GroupedOpenApi Bean 列表
+     */
+    private List<Object> getGroupedOpenApiBeans() {
+        List<Object> groupedOpenApis = new ArrayList<>();
+        
+        // 尝试获取 SpringDoc 2.x 的 GroupedOpenApi (org.springdoc.core.models.GroupedOpenApi)
+        try {
+            Class<?> groupedOpenApiClass = Class.forName("org.springdoc.core.models.GroupedOpenApi");
+            Map<String, ?> beans = applicationContext.getBeansOfType(groupedOpenApiClass);
+            groupedOpenApis.addAll(beans.values());
+        } catch (ClassNotFoundException ignored) {
+            // SpringDoc 2.x 不存在，尝试 1.x
+        }
+        
+        // 尝试获取 SpringDoc 1.x 的 GroupedOpenApi (org.springdoc.core.GroupedOpenApi)
+        try {
+            Class<?> groupedOpenApiClass = Class.forName("org.springdoc.core.GroupedOpenApi");
+            Map<String, ?> beans = applicationContext.getBeansOfType(groupedOpenApiClass);
+            groupedOpenApis.addAll(beans.values());
+        } catch (ClassNotFoundException ignored) {
+            // SpringDoc 1.x 不存在
+        }
+        
+        return groupedOpenApis;
     }
 
     /**

@@ -20,28 +20,28 @@
     </properties>
 
     <dependencies>
-        <!-- Spring Boot AutoConfigure (必需) -->
+        <!-- Spring Boot AutoConfigure (可选，由使用方提供) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-autoconfigure</artifactId>
             <version>2.7.18</version>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
 
-        <!-- Spring Web (provided，由使用方提供) -->
+        <!-- Spring Web (可选，由使用方提供) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
             <version>2.7.18</version>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
 
-        <!-- Jackson (provided，由使用方提供) -->
+        <!-- Jackson (可选，由使用方提供) -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>2.13.5</version>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
 
         <!-- SpringDoc OpenAPI (可选，用户根据自己版本引入) -->
