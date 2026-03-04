@@ -1,5 +1,3 @@
-# Yudao Swagger new UI
-
 <p align="center">
   <img src="ui/public/favicon-green.svg" alt="Yudao Swagger UI Logo" width="120" height="120">
 </p>
