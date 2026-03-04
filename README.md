@@ -18,7 +18,7 @@
   <a href="#技术栈">技术栈</a>
 </p>
 
-![home](./docs/img/swagger-home-dark.png)
+![home](/docs/img/swagger-home-dark.png)
 
 
 ## 特性
