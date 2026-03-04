@@ -1,4 +1,3 @@
-
 ![home](./docs/img/swagger-home-dark.png)
 
 # NEW UI
@@ -8,48 +7,52 @@
 </p>
 
 <p align="center">
-兼容 Spring Boot 2.x、3.x
+  Compatible with Spring Boot 2.x & 3.x
 </p>
 
 <p align="center">
-  <a href="#特性">特性</a> •
-  <a href="#快速开始">快速开始</a> •
-  <a href="#配置说明">配置说明</a> •
-  <a href="#本地开发">本地开发</a> •
-  <a href="#技术栈">技术栈</a>
+  <a href="#features">Features</a> •
+  <a href="#quick-start">Quick Start</a> •
+  <a href="#configuration">Configuration</a> •
+  <a href="#local-development">Local Development</a> •
+  <a href="#tech-stack">Tech Stack</a>
+  <a href="./README-CN.md">中文文档</a>
 </p>
 
-## 特性
+---
 
-- 🎨 **现代化 UI** - 基于 React 19 构建，界面美观易用，支持亮色/暗色主题
-- 🔧 **高度可配置** - 支持自定义路径、API 地址等配置
-- 📦 **双版本支持** - 同时支持 Spring Boot 2.x 和 3.x，使用统一的 Starter
-- 🚀 **零侵入** - 无需修改现有代码，引入依赖即可使用
-- 🌐 **分组支持** - 完整支持 SpringDoc 分组功能
-- ⚡ **动态注入** - 支持向页面注入动态配置
-- 🌙 **主题切换** - 内置亮色/暗色主题，自动保存偏好
-- 📱 **可调整侧边栏** - 支持拖拽调整侧边栏宽度
-- 🔐 **认证支持** - 支持 Bearer Token 认证
-- 💾 **状态持久化** - 自动保存主题、分组、侧边栏宽度等偏好设置
-<h3 align="center">一个现代化、美观的 Swagger new UI 界面</h3>
+## Features
 
+- 🎨 **Modern UI** - Built with React 19, beautiful and easy-to-use interface with light/dark theme support
+- 🔧 **Highly Configurable** - Support custom paths, API URLs, and other configurations
+- 📦 **Dual Version Support** - Supports both Spring Boot 2.x and 3.x with a unified Starter
+- 🚀 **Zero Intrusion** - No need to modify existing code, just add the dependency
+- 🌐 **Group Support** - Complete support for SpringDoc grouping functionality
+- ⚡ **Dynamic Injection** - Support injecting dynamic configurations into the page
+- 🌙 **Theme Switching** - Built-in light/dark themes with automatic preference saving
+- 📱 **Resizable Sidebar** - Support drag-to-resize sidebar width
+- 🔐 **Authentication Support** - Bearer Token authentication support
+- 💾 **State Persistence** - Auto-saves preferences like theme, group, sidebar width, etc.
 
-## 界面预览
+<h3 align="center">A modern, beautiful Swagger UI interface</h3>
 
-![home](docs/img/swagger-home-dark.png)
-![home](docs/img/swagger-home-light.png)
+## Screenshots
 
-## 快速开始
+| Dark Theme | Light Theme |
+|------------|-------------|
+| ![Dark Theme](docs/img/swagger-home-dark.png) | ![Light Theme](docs/img/swagger-home-light.png) |
 
-### 环境要求
+## Quick Start
 
-| 组件 | 版本要求 |
-|------|----------|
+### Requirements
+
+| Component | Version Requirement |
+|-----------|---------------------|
 | Java | 8+ (Spring Boot 2.x) / 17+ (Spring Boot 3.x) |
-| Spring Boot | 2.7.x 或 3.x |
+| Spring Boot | 2.7.x or 3.x |
 | SpringDoc | 1.7.0+ (Boot 2) / 2.3.0+ (Boot 3) |
 
-### 1. 引入依赖
+### 1. Add Dependency
 
 #### Maven
 
@@ -67,9 +70,9 @@
 implementation 'cn.coget:yudao-swagger-new-ui-boot-starter:1.0.1-RELEASE'
 ```
 
-### 2. 添加 SpringDoc 依赖
+### 2. Add SpringDoc Dependency
 
-根据你的 Spring Boot 版本，添加对应的 SpringDoc 依赖：
+Add the corresponding SpringDoc dependency based on your Spring Boot version:
 
 #### Spring Boot 2.x
 
@@ -91,46 +94,46 @@ implementation 'cn.coget:yudao-swagger-new-ui-boot-starter:1.0.1-RELEASE'
 </dependency>
 ```
 
-### 3. 启动应用
+### 3. Start Application
 
-启动 Spring Boot 应用后，访问以下地址：
+After starting your Spring Boot application, visit:
 
 ```
 http://localhost:8080/swagger-new-ui.html
 ```
 
-## 配置说明
+## Configuration
 
-### 完整配置示例
+### Complete Configuration Example
 
-在 `application.yml` 中添加以下配置：
+Add the following configuration in `application.yml`:
 
 ```yaml
 swagger-new-ui:
-  # Swagger UI 访问路径，支持多个路径（逗号分割）
+  # Swagger UI access paths, supports multiple paths (comma-separated)
   paths: /swagger-new-ui.html,/swagger-ui.html,/doc.html
-  # 基础 URL 路径，适用于有 context-path 的场景
+  # Base URL path, for context-path scenarios
   base-url: /
-  # OpenAPI 文档的 API 路径
+  # OpenAPI docs API path
   api-path: /v3/api-docs
-  # 自定义注入配置（可通过 window.SWAGGER_UI_CONFIG 访问）
+  # Custom injected configuration (accessible via window.SWAGGER_UI_CONFIG)
   inject-config:
     custom-key: custom-value
 ```
 
-### 配置项说明
+### Configuration Properties
 
-| 配置项 | 说明 | 默认值 |
-|--------|------|--------|
-| `paths` | Swagger UI 访问路径，支持多个路径（逗号分割） | `/swagger-new-ui.html` |
-| `groups-api-path` | 分组 API 的访问路径 | `/swagger-new-ui/groups` |
-| `base-url` | 应用的基础 URL 路径，适用于有 context-path 的场景 | `/` |
-| `api-path` | OpenAPI 文档的 API 路径 | `/v3/api-docs` |
-| `inject-config` | 自定义注入到页面的配置，可通过 `window.SWAGGER_UI_CONFIG` 访问 | `{}` |
+| Property | Description | Default Value |
+|----------|-------------|---------------|
+| `paths` | Swagger UI access paths, supports multiple paths (comma-separated) | `/swagger-new-ui.html` |
+| `groups-api-path` | Groups API access path | `/swagger-new-ui/groups` |
+| `base-url` | Application base URL path, for context-path scenarios | `/` |
+| `api-path` | OpenAPI docs API path | `/v3/api-docs` |
+| `inject-config` | Custom configuration injected into the page, accessible via `window.SWAGGER_UI_CONFIG` | `{}` |
 
-### 配合 context-path 使用
+### Usage with context-path
 
-如果应用配置了 `context-path`，需要同步配置 `base-url`：
+If your application has a `context-path` configured, you need to also configure `base-url`:
 
 ```yaml
 server:
@@ -142,88 +145,88 @@ swagger-new-ui:
   paths: swagger-new-ui.html,swagger-ui.html,doc.html
 ```
 
-此时访问地址为：`http://localhost:8080/admin/swagger-new-ui.html`
+Then access at: `http://localhost:8080/admin/swagger-new-ui.html`
 
-## 使用示例
+## Usage Examples
 
-### 基础 Controller 示例
+### Basic Controller Example
 
 ```java
 @RestController
 @RequestMapping("/api/users")
-@Tag(name = "用户管理", description = "用户相关接口")
+@Tag(name = "User Management", description = "User-related APIs")
 public class UserController {
-    
+
     @GetMapping("/{id}")
-    @Operation(summary = "获取用户信息", description = "根据用户ID获取用户详细信息")
+    @Operation(summary = "Get user info", description = "Get detailed user information by user ID")
     public Result<UserVO> getUser(
-            @Parameter(description = "用户ID", required = true) 
+            @Parameter(description = "User ID", required = true)
             @PathVariable Long id) {
         // ...
     }
-    
+
     @PostMapping
-    @Operation(summary = "创建用户")
+    @Operation(summary = "Create user")
     public Result<UserVO> createUser(@RequestBody UserCreateDTO dto) {
         // ...
     }
 }
 ```
 
-### 配置分组
+### Configure Groups
 
-通过 `GroupedOpenApi` 配置 API 分组：
+Configure API groups using `GroupedOpenApi`:
 
 ```java
 @Configuration
 public class SwaggerConfig {
-    
+
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("API 文档")
+                        .title("API Documentation")
                         .version("1.0"));
     }
-    
+
     @Bean
     public GroupedOpenApi userApi() {
         return GroupedOpenApi.builder()
-                .group("用户API")
+                .group("User API")
                 .pathsToMatch("/api/users/**")
                 .build();
     }
-    
+
     @Bean
     public GroupedOpenApi orderApi() {
         return GroupedOpenApi.builder()
-                .group("订单API")
+                .group("Order API")
                 .pathsToMatch("/api/orders/**")
                 .build();
     }
 }
 ```
 
-## 项目结构
+## Project Structure
 
 ```
 yudao-swagger-ui/
-├── yudao-swagger-new-ui-boot-starter/    # Spring Boot Starter 模块
+├── yudao-swagger-new-ui-boot-starter/    # Spring Boot Starter Module
 │   ├── pom.xml
 │   └── src/main/
 │       ├── java/cn/coget/swagger/autoconfigure/
-│       │   ├── SwaggerUiAutoConfiguration.java   # 自动配置类
-│       │   └── SwaggerUiProperties.java          # 配置属性类
+│       │   ├── SwaggerUiAutoConfiguration.java   # Auto-configuration class
+│       │   └── SwaggerUiProperties.java          # Configuration properties class
 │       └── resources/
 │           ├── META-INF/
-│           │   ├── spring.factories              # Spring Boot 2.x 自动配置
+│           │   ├── spring.factories              # Spring Boot 2.x auto-config
 │           │   └── spring/
 │           │       └── org.springframework.boot.autoconfigure.AutoConfiguration.imports  # Spring Boot 3.x
-│           └── static/                           # Swagger UI 静态资源
+│           └── static/                           # Swagger UI static resources
 │               ├── index.html
 │               └── assets/
-├── examples/                                    # 示例项目
-│   ├── yudao-swagger-ui-spring-boot2-example/  # Spring Boot 2.x 示例
+├── examples/                                    # Example Projects
+│   ├── yudao-swagger-ui-spring-boot2-example/  # Spring Boot 2.x Example
 │   │   └── src/main/
 │   │       ├── java/cn/coget/examples/
 │   │       │   ├── config/
@@ -231,139 +234,161 @@ yudao-swagger-ui/
 │   │       │   ├── dto/
 │   │       │   └── vo/
 │   │       └── resources/application.yml
-│   └── yudao-swagger-ui-spring-boot3-example/  # Spring Boot 3.x 示例
+│   └── yudao-swagger-ui-spring-boot3-example/  # Spring Boot 3.x Example
 │       └── src/main/
 │           ├── java/cn/coget/examples/
 │           └── resources/application.yml
-├── ui/                                          # 前端源码
+├── ui/                                          # Frontend Source Code
 │   ├── src/
-│   │   ├── App.jsx                              # 主应用组件
-│   │   ├── components/                          # React 组件
-│   │   │   ├── Sidebar.jsx                      # 侧边栏
-│   │   │   ├── MainContent.jsx                  # 主内容区
-│   │   │   ├── SettingsModal.jsx               # 设置弹窗
-│   │   │   ├── icons/                          # 图标组件
-│   │   │   └── main-content/                   # 主内容子组件
-│   │   ├── hooks/                              # 自定义 Hooks
-│   │   └── styles/                             # 样式文件
+│   │   ├── App.jsx                              # Main App Component
+│   │   ├── components/                          # React Components
+│   │   │   ├── Sidebar.jsx                      # Sidebar
+│   │   │   ├── MainContent.jsx                  # Main Content Area
+│   │   │   ├── SettingsModal.jsx               # Settings Modal
+│   │   │   ├── icons/                          # Icon Components
+│   │   │   └── main-content/                   # Main Content Sub-components
+│   │   ├── hooks/                              # Custom Hooks
+│   │   └── styles/                             # Style Files
 │   ├── package.json
 │   └── vite.config.js
-└── build.sh                                    # 构建脚本
+└── build.sh                                    # Build Script
 ```
 
-## 本地开发
+## Local Development
 
-### 构建完整项目
+### Build Complete Project
 
-使用提供的构建脚本，自动完成前端构建和后端打包：
+Use the provided build script to automatically complete frontend build and backend packaging:
 
 ```bash
 ./build.sh
 ```
 
-该脚本会：
-1. 构建前端 React 项目（`npm run build:java`）
-2. 将构建产物复制到 Starter 的 static 目录
-3. 使用 JDK 8 编译并安装 Starter 到本地 Maven 仓库
+This script will:
+1. Build the React project (`npm run build:java`)
+2. Copy build artifacts to the Starter's static directory
+3. Compile and install the Starter to local Maven repository using JDK 8
 
-### 前端开发
+### Frontend Development
 
 ```bash
 cd ui
 
-# 安装依赖
+# Install dependencies
 npm install
 
-# 开发模式（带代理）
+# Development mode (with proxy)
 npm run dev
 
-# 构建生产版本（用于 Java 项目）
+# Build production version (for Java projects)
 npm run build:java
 
-# 构建标准版本
+# Build standard version
 npm run build
 ```
 
-开发模式下，Vite 会自动代理以下路径到后端：
+In development mode, Vite automatically proxies the following paths to the backend:
 - `/v3/*` → `http://127.0.0.1:8080`
 - `/api/*` → `http://127.0.0.1:8080`
 - `/swagger-new-ui/*` → `http://127.0.0.1:8080`
 
-### 运行示例项目
+### Run Example Projects
 
 ```bash
-# Spring Boot 2.x 示例
+# Spring Boot 2.x Example
 cd examples/yudao-swagger-ui-spring-boot2-example
 mvn spring-boot:run
 
-# Spring Boot 3.x 示例
+# Spring Boot 3.x Example
 cd examples/yudao-swagger-ui-spring-boot3-example
 mvn spring-boot:run
 ```
 
-访问：`http://localhost:8080/admin/swagger-new-ui.html`
+Access: `http://localhost:8080/admin/swagger-new-ui.html`
 
-### 仅构建后端模块
+### Build Backend Module Only
 
 ```bash
 cd yudao-swagger-new-ui-boot-starter
 mvn clean install -DskipTests
 ```
 
-### 发布到 Maven 仓库
+### Publish to Maven Repository
 
 ```bash
 mvn clean deploy
 ```
 
-> 注意：需要在 `~/.m2/settings.xml` 中配置仓库认证信息。
+> Note: Need to configure repository authentication in `~/.m2/settings.xml`.
 
-## 技术栈
+## Tech Stack
 
-### 前端
+### Frontend
 
-| 技术 | 版本 | 说明 |
-|------|------|------|
-| React | 19.x | UI 框架 |
-| Vite | 7.x | 构建工具 |
-| SCSS | - | 样式预处理 |
-| highlight.js | 11.x | 代码高亮 |
+| Technology | Version | Description |
+|------------|---------|-------------|
+| React | 19.x | UI Framework |
+| Vite | 7.x | Build Tool |
+| SCSS | - | Style Preprocessor |
+| highlight.js | 11.x | Code Highlighting |
 
-### 后端
+### Backend
 
-| 技术 | 版本 | 说明 |
-|------|------|------|
-| Spring Boot | 2.7.x / 3.x | 应用框架 |
-| SpringDoc OpenAPI | 1.7.x / 2.x | API 文档生成 |
-| Java | 8+ / 17+ | 运行环境 |
+| Technology | Version | Description |
+|------------|---------|-------------|
+| Spring Boot | 2.7.x / 3.x | Application Framework |
+| SpringDoc OpenAPI | 1.7.x / 2.x | API Documentation Generation |
+| Java | 8+ / 17+ | Runtime Environment |
 
-## 兼容性
+## Compatibility
 
 | Spring Boot | Java | SpringDoc | Starter |
 |-------------|------|-----------|---------|
-| 2.7.x | 8+ | 1.7.x | ✅ 支持 |
-| 3.x | 17+ | 2.x | ✅ 支持 |
+| 2.7.x | 8+ | 1.7.x | ✅ Supported |
+| 3.x | 17+ | 2.x | ✅ Supported |
 
-Starter 使用 JDK 8 编译，确保与所有版本兼容。
+The Starter is compiled with JDK 8 to ensure compatibility with all versions.
 
-## 常见问题
+## How It Works
 
-### Q: 如何修改默认访问路径？
+### Auto-Configuration Mechanism
 
-A: 在 `application.yml` 中配置 `swagger-new-ui.paths`：
+The starter uses Spring Boot's auto-configuration mechanism:
+
+1. **Spring Boot 2.x**: Uses `META-INF/spring.factories` to register the auto-configuration
+2. **Spring Boot 3.x**: Uses `META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports`
+
+### Dynamic HTML Injection
+
+`SwaggerUiAutoConfiguration` reads the static `index.html` template and injects a `<script>` tag containing `window.SWAGGER_UI_CONFIG` with dynamic configuration values.
+
+### SpringDoc Compatibility
+
+The starter uses reflection to detect and work with both SpringDoc 1.x (Spring Boot 2.x) and SpringDoc 2.x (Spring Boot 3.x):
+
+- SpringDoc 2.x: `org.springdoc.core.models.GroupedOpenApi`
+- SpringDoc 1.x: `org.springdoc.core.GroupedOpenApi`
+
+Both versions have a `getGroup()` method that is invoked reflectively.
+
+## FAQ
+
+### Q: How to change the default access path?
+
+A: Configure `swagger-new-ui.paths` in `application.yml`:
 
 ```yaml
 swagger-new-ui:
   paths: /doc.html
 ```
 
-### Q: 如何配置认证 Token？
+### Q: How to configure authentication Token?
 
-A: 在界面右上角点击设置图标，输入 Bearer Token。
+A: Click the settings icon in the top-right corner of the interface and enter the Bearer Token.
 
-### Q: 如何自定义注入配置？
+### Q: How to customize injected configuration?
 
-A: 使用 `inject-config` 配置项：
+A: Use the `inject-config` property:
 
 ```yaml
 swagger-new-ui:
@@ -372,22 +397,23 @@ swagger-new-ui:
     app-version: 1.0.0
 ```
 
-在前端可通过 `window.SWAGGER_UI_CONFIG` 访问。
+Accessible in frontend via `window.SWAGGER_UI_CONFIG`.
 
-### Q: 为什么 Spring Boot 2 和 3 使用同一个 Starter？
+### Q: Why does Spring Boot 2 and 3 use the same Starter?
 
-A: Starter 使用 JDK 8 编译，同时兼容 Spring Boot 2.x 和 3.x。代码通过反射动态检测 SpringDoc 版本，自动适配不同的 API。
+A: The Starter is compiled with JDK 8 and is compatible with both Spring Boot 2.x and 3.x. The code dynamically detects the SpringDoc version via reflection and automatically adapts to different APIs.
 
-## 贡献指南
+## Contributing
 
-欢迎提交 Issue 和 Pull Request！
+Issues and Pull Requests are welcome!
 
 ## License
 
 [MIT License](LICENSE)
 
-## 致谢
+## Acknowledgments
 
-- [SpringDoc OpenAPI](https://springdoc.org/) - OpenAPI 3 文档生成
-- [React](https://react.dev/) - UI 框架
-- [Vite](https://vitejs.dev/) - 下一代前端构建工具
+- [SpringDoc OpenAPI](https://springdoc.org/) - OpenAPI 3 documentation generation
+- [React](https://react.dev/) - UI framework
+- [Vite](https://vitejs.dev/) - Next generation frontend tooling
+
