@@ -1,12 +1,15 @@
+
+![home](./docs/img/swagger-home-dark.png)
+
+# NEW UI
+
 <p align="center">
-  <img src="ui/public/favicon-green.svg" alt="Yudao Swagger UI Logo" width="120" height="120">
+  <img src="./docs/img/logo.svg" alt="Yudao Swagger UI Logo" height="120">
 </p>
-<h3 align="center">一个现代化、美观的 Swagger new UI 界面</h3>
 
 <p align="center">
 兼容 Spring Boot 2.x、3.x
 </p>
-
 
 <p align="center">
   <a href="#特性">特性</a> •
@@ -15,9 +18,6 @@
   <a href="#本地开发">本地开发</a> •
   <a href="#技术栈">技术栈</a>
 </p>
-
-![home](/docs/img/swagger-home-dark.png)
-
 
 ## 特性
 
@@ -31,6 +31,8 @@
 - 📱 **可调整侧边栏** - 支持拖拽调整侧边栏宽度
 - 🔐 **认证支持** - 支持 Bearer Token 认证
 - 💾 **状态持久化** - 自动保存主题、分组、侧边栏宽度等偏好设置
+<h3 align="center">一个现代化、美观的 Swagger new UI 界面</h3>
+
 
 ## 界面预览
 
