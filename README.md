@@ -1,9 +1,9 @@
-# Yudao Swagger Mew UI
+# Yudao Swagger new UI
 
 <p align="center">
   <img src="ui/public/favicon-green.svg" alt="Yudao Swagger UI Logo" width="120" height="120">
 </p>
-<h3 align="center">一个现代化、美观的 Swagger Mew UI 界面</h3>
+<h3 align="center">一个现代化、美观的 Swagger new UI 界面</h3>
 
 <p align="center">
 兼容 Spring Boot 2.x、3.x
