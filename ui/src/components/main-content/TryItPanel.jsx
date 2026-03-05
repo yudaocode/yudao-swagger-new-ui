@@ -1,10 +1,14 @@
-import React, { useState, useRef, useEffect, useMemo } from 'react'
+import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react'
+import hljs from 'highlight.js/lib/core'
+import json from 'highlight.js/lib/languages/json'
 import CodeExample, { useCodeExamples } from './CodeExample'
 import ParamsInput from './ParamsInput'
 import MultipartInput from './MultipartInput'
 import ResponseDisplay from './ResponseDisplay'
 import SendIcon from '../icons/SendIcon'
 import './TryItPanel.scss'
+
+hljs.registerLanguage('json', json)
 
 /**
  * 右侧测试面板
@@ -36,6 +40,8 @@ function TryItPanel({
   const [copySuccess, setCopySuccess] = useState(false)
   const [isEditingBody, setIsEditingBody] = useState(false)
   const textareaRef = useRef(null)
+  const highlightRef = useRef(null)
+  const highlightPreRef = useRef(null)
 
   // 判断 request body 是否为空
   // 支持对象 {} 和数组 [] 类型的空值判断
@@ -53,6 +59,24 @@ function TryItPanel({
     }
     return false
   }, [requestBody])
+
+  // JSON 语法高亮
+  useEffect(() => {
+    if (highlightRef.current && requestBody) {
+      highlightRef.current.textContent = requestBody
+      highlightRef.current.removeAttribute('data-highlighted')
+      highlightRef.current.className = 'language-json'
+      hljs.highlightElement(highlightRef.current)
+    }
+  }, [requestBody])
+
+  // 同步滚动 - 同步 pre 元素的滚动
+  const handleScroll = useCallback((e) => {
+    if (highlightPreRef.current) {
+      highlightPreRef.current.scrollTop = e.target.scrollTop
+      highlightPreRef.current.scrollLeft = e.target.scrollLeft
+    }
+  }, [])
 
   // 当开始编辑时，聚焦 textarea
   useEffect(() => {
@@ -130,17 +154,23 @@ function TryItPanel({
               <span className="body-empty-text">No content</span>
             </div>
           ) : (
-            <textarea
-              ref={textareaRef}
-              className="body-input"
-              value={requestBody}
-              onChange={(e) => onRequestBodyChange(e.target.value)}
-              onBlur={() => {
-                if (isRequestBodyEmpty) {
-                  setIsEditingBody(false)
-                }
-              }}
-            />
+            <div className="body-input-wrapper">
+              <pre ref={highlightPreRef} className="body-highlight">
+                <code ref={highlightRef} className="language-json" />
+              </pre>
+              <textarea
+                ref={textareaRef}
+                className="body-input"
+                value={requestBody}
+                onChange={(e) => onRequestBodyChange(e.target.value)}
+                onScroll={handleScroll}
+                onBlur={() => {
+                  if (isRequestBodyEmpty) {
+                    setIsEditingBody(false)
+                  }
+                }}
+              />
+            </div>
           )}
         </div>
       )}
