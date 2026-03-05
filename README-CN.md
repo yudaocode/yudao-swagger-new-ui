@@ -15,8 +15,8 @@
   <a href="#快速开始">快速开始</a> •
   <a href="#配置说明">配置说明</a> •
   <a href="#本地开发">本地开发</a> •
-  <a href="#技术栈">技术栈</a>
-   <a href="https://gitcode.csdn.net/">AtomGit</a>
+  <a href="#技术栈">技术栈</a> •
+   <a href="https://atomgit.com/yudaocode/yudao-swagger-new-ui">AtomGit</a>
 </p>
 
 ---
