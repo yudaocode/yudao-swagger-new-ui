@@ -414,10 +414,4 @@ Issues and Pull Requests are welcome!
 
 [MIT License](LICENSE)
 
-## Acknowledgments
-
-- [SpringDoc OpenAPI](https://springdoc.org/) - OpenAPI 3 documentation generation
-- [React](https://react.dev/) - UI framework
-- [Vite](https://vitejs.dev/) - Next generation frontend tooling
-
 <img src="https://bbc-ps.oss-cn-shenzhen.aliyuncs.com/www/new-ui.png" alt="Yudao Swagger UI Logo" height="300">
