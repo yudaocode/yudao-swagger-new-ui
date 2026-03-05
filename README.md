@@ -420,3 +420,4 @@ Issues and Pull Requests are welcome!
 - [React](https://react.dev/) - UI framework
 - [Vite](https://vitejs.dev/) - Next generation frontend tooling
 
+<img src="https://bbc-ps.oss-cn-shenzhen.aliyuncs.com/www/new-ui.png" alt="Yudao Swagger UI Logo" height="300">

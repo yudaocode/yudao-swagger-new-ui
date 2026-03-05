@@ -415,3 +415,5 @@ A: Starter 使用 JDK 8 编译，同时兼容 Spring Boot 2.x 和 3.x。代码�
 - [SpringDoc OpenAPI](https://springdoc.org/) - OpenAPI 3 文档生成
 - [React](https://react.dev/) - UI 框架
 - [Vite](https://vitejs.dev/) - 下一代前端构建工具
+
+<img src="https://bbc-ps.oss-cn-shenzhen.aliyuncs.com/www/new-ui.png" alt="Yudao Swagger UI Logo" height="300">
