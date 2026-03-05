@@ -15,8 +15,9 @@
   <a href="#quick-start">Quick Start</a> •
   <a href="#configuration">Configuration</a> •
   <a href="#local-development">Local Development</a> •
-  <a href="#tech-stack">Tech Stack</a>
-  <a href="./README-CN.md">中文文档</a>
+  <a href="#tech-stack">Tech Stack</a> •
+  <a href="./README-CN.md">中文文档</a> •
+  <a href="https://atomgit.com/yudaocode/yudao-swagger-new-ui">AtomGit</a>
 </p>
 
 ---
