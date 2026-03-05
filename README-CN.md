@@ -57,10 +57,9 @@
 <dependency>
     <groupId>cn.coget</groupId>
     <artifactId>yudao-swagger-new-ui-boot-starter</artifactId>
-    <version>1.0.2-RELEASE</version>
+    <version>1.0.3-RELEASE</version>
     <type>pom</type>
 </dependency>
-
 ```
 
 #### Gradle
