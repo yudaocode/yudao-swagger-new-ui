@@ -18,7 +18,7 @@
     <properties>
         <java.version>1.8</java.version>
         <lombok.version>1.18.30</lombok.version>
-        <yudao-swagger-new-ui-boot-starter.version>1.0.1-RELEASE</yudao-swagger-new-ui-boot-starter.version>
+        <yudao-swagger-new-ui-boot-starter.version>1.0.3-RELEASE</yudao-swagger-new-ui-boot-starter.version>
         <springdoc-boot2.version>1.7.0</springdoc-boot2.version>
     </properties>
 
