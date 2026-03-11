@@ -111,13 +111,10 @@ http://localhost:8080/swagger-new-ui.html
 swagger-new-ui:
   # Swagger UI 访问路径，支持多个路径（逗号分割）
   paths: /swagger-new-ui.html,/swagger-ui.html,/doc.html
-  # 基础 URL 路径，适用于有 context-path 的场景
+  # 基础 URL 路径，适用于有 context-path 的场景(如果有前缀需要设置一下)
   base-url: /
-  # OpenAPI 文档的 API 路径
+  # OpenAPI 文档的 API 路径(不然不用管)
   api-path: /v3/api-docs
-  # 自定义注入配置（可通过 window.SWAGGER_UI_CONFIG 访问）
-  inject-config:
-    custom-key: custom-value
 ```
 
 ### 配置项说明
