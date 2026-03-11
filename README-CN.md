@@ -113,7 +113,7 @@ swagger-new-ui:
   paths: /swagger-new-ui.html,/swagger-ui.html,/doc.html
   # 基础 URL 路径，适用于有 context-path 的场景(如果有前缀需要设置一下)
   base-url: /
-  # OpenAPI 文档的 API 路径(不然不用管)
+  # OpenAPI 文档的 API 路径(默认不用管)
   api-path: /v3/api-docs
 ```
 

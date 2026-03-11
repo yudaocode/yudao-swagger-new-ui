@@ -119,9 +119,6 @@ swagger-new-ui:
   base-url: /
   # OpenAPI docs API path
   api-path: /v3/api-docs
-  # Custom injected configuration (accessible via window.SWAGGER_UI_CONFIG)
-  inject-config:
-    custom-key: custom-value
 ```
 
 ### Configuration Properties
