@@ -1,6 +1,8 @@
 package cn.coget.examples.controller;
 
+import cn.coget.examples.dto.UserBatchDeleteDTO;
 import cn.coget.examples.dto.UserCreateDTO;
+import cn.coget.examples.dto.UserMultiLevelDTO;
 import cn.coget.examples.dto.UserQueryDTO;
 import cn.coget.examples.dto.UserUpdateDTO;
 import cn.coget.examples.vo.ErrorResponse;
@@ -110,11 +112,17 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "批量删除用户", description = "根据用户ID列表批量删除用户")
+    @Operation(summary = "批量删除用户", description = "根据用户ID列表批量删除用户，支持填写删除原因")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "批量删除成功"),
+            @ApiResponse(responseCode = "400", description = "参数错误",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @DeleteMapping("/batch")
     public Result<Integer> batchDeleteUsers(
-            @Parameter(description = "用户ID列表", required = true) @RequestBody List<Long> ids) {
-        return Result.success(ids.size());
+            @org.springframework.web.bind.annotation.RequestBody UserBatchDeleteDTO dto) {
+        return Result.success(dto.getIds().size());
     }
 
     @Operation(summary = "用户登录", description = "用户登录接口，返回用户信息")
@@ -245,5 +253,18 @@ public class UserController {
         result.put("email", email);
         result.put("isPublic", isPublic);
         return Result.success(result);
+    }
+
+    @Operation(summary = "创建多级用户信息", description = "测试多级嵌套对象和数组的UI渲染")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "创建成功"),
+            @ApiResponse(responseCode = "400", description = "参数错误",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @PostMapping("/multi-level")
+    public ResponseEntity<Result<UserMultiLevelDTO>> createMultiLevelUser(
+            @org.springframework.web.bind.annotation.RequestBody UserMultiLevelDTO dto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(Result.success(dto));
     }
 }
