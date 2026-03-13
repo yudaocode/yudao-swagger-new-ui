@@ -61,7 +61,7 @@
 <dependency>
     <groupId>cn.coget</groupId>
     <artifactId>yudao-swagger-new-ui-boot-starter</artifactId>
-    <version>1.0.3-RELEASE</version>
+    <version>1.0.4-RELEASE</version>
     <type>pom</type>
 </dependency>
 
@@ -70,7 +70,7 @@
 #### Gradle
 
 ```groovy
-implementation 'cn.coget:yudao-swagger-new-ui-boot-starter:1.0.1-RELEASE'
+implementation 'cn.coget:yudao-swagger-new-ui-boot-starter:1.0.4-RELEASE'
 ```
 
 ### 2. Add SpringDoc Dependency
