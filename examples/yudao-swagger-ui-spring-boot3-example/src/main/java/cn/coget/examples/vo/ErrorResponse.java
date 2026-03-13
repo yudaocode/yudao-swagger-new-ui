@@ -7,16 +7,16 @@ import lombok.Data;
 @Schema(description = "错误响应")
 public class ErrorResponse {
 
-    @Schema(description = "错误码")
+    @Schema(description = "错误码", example = "400")
     private Integer code;
 
-    @Schema(description = "错误消息")
+    @Schema(description = "错误消息", example = "Bad Request")
     private String message;
 
-    @Schema(description = "错误详情")
+    @Schema(description = "错误详情", example = "参数校验失败")
     private String details;
 
-    @Schema(description = "时间戳")
+    @Schema(description = "时间戳", example = "1234567890")
     private Long timestamp;
 
     public static ErrorResponse of(Integer code, String message, String details) {

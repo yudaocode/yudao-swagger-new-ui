@@ -36,7 +36,7 @@ public class UserController {
     @GetMapping
     public Result<List<UserVO>> getUsers(
             @Parameter(description = "查询条件") UserQueryDTO query,
-            @Parameter(description = "额外参数1") @RequestParam(required = false) String var1) {
+            @Parameter(description = "额外参数1", example = "value1") @RequestParam(required = false) String var1) {
         List<UserVO> users = new ArrayList<>();
         UserVO user = new UserVO();
         user.setId(1L);
@@ -55,8 +55,8 @@ public class UserController {
     })
     @GetMapping("/{id}")
     public Result<UserVO> getUserInfo(
-            @Parameter(description = "用户ID", required = true) @PathVariable Long id,
-            @Parameter(description = "用户名") @RequestParam(required = false) String name) {
+            @Parameter(description = "用户ID", required = true, example = "1") @PathVariable Long id,
+            @Parameter(description = "用户名", example = "admin") @RequestParam(required = false) String name) {
         UserVO user = new UserVO();
         user.setId(id);
         user.setUsername("admin");
@@ -90,7 +90,7 @@ public class UserController {
     })
     @PutMapping("/{id}")
     public Result<UserVO> updateUser(
-            @Parameter(description = "用户ID", required = true) @PathVariable Long id,
+            @Parameter(description = "用户ID", required = true, example = "1") @PathVariable Long id,
             @org.springframework.web.bind.annotation.RequestBody UserUpdateDTO dto) {
         UserVO user = new UserVO();
         user.setId(id);
@@ -142,8 +142,8 @@ public class UserController {
     })
     @PostMapping("/login")
     public ResponseEntity<?> login(
-            @Parameter(description = "用户名", required = true) @RequestParam String username,
-            @Parameter(description = "密码", required = true) @RequestParam String password) {
+            @Parameter(description = "用户名", required = true, example = "admin") @RequestParam String username,
+            @Parameter(description = "密码", required = true, example = "123456") @RequestParam String password) {
 
         if (username == null || username.isEmpty()) {
             return ResponseEntity
@@ -174,16 +174,16 @@ public class UserController {
     @Operation(summary = "修改密码", description = "用户修改密码")
     @PatchMapping("/{id}/password")
     public Result<Boolean> changePassword(
-            @Parameter(description = "用户ID", required = true) @PathVariable Long id,
-            @Parameter(description = "旧密码", required = true) @RequestParam String oldPassword,
-            @Parameter(description = "新密码", required = true) @RequestParam String newPassword) {
+            @Parameter(description = "用户ID", required = true, example = "1") @PathVariable Long id,
+            @Parameter(description = "旧密码", required = true, example = "oldpass123") @RequestParam String oldPassword,
+            @Parameter(description = "新密码", required = true, example = "newpass456") @RequestParam String newPassword) {
         return Result.success(true);
     }
 
     @Operation(summary = "检查用户名是否存在", description = "检查用户名是否已被使用")
     @GetMapping("/check-username")
     public Result<Boolean> checkUsername(
-            @Parameter(description = "用户名", required = true) @RequestParam String username) {
+            @Parameter(description = "用户名", required = true, example = "zhangsan") @RequestParam String username) {
         return Result.success("admin".equals(username));
     }
 
@@ -200,7 +200,7 @@ public class UserController {
     @Operation(summary = "导出用户数据", description = "导出用户数据为文件")
     @GetMapping("/export")
     public ResponseEntity<String> exportUsers(
-            @Parameter(description = "文件格式") @RequestParam(defaultValue = "xlsx") String format) {
+            @Parameter(description = "文件格式", example = "xlsx") @RequestParam(defaultValue = "xlsx") String format) {
         return ResponseEntity.ok()
                 .header("Content-Disposition", "attachment; filename=users." + format)
                 .body("id,username,email\n1,admin,admin@example.com\n2,user,user@example.com");
@@ -209,7 +209,7 @@ public class UserController {
     @Operation(summary = "上传头像", description = "上传用户头像图片")
     @PostMapping(value = "/{id}/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Result<Map<String, Object>> uploadAvatar(
-            @Parameter(description = "用户ID", required = true) @PathVariable Long id,
+            @Parameter(description = "用户ID", required = true, example = "1") @PathVariable Long id,
             @Parameter(description = "头像文件", required = true)
             @RequestPart("file") MultipartFile file) {
         Map<String, Object> result = new HashMap<>();
@@ -226,7 +226,7 @@ public class UserController {
     public Result<List<Map<String, Object>>> uploadFiles(
             @Parameter(description = "文件列表", required = true)
             @RequestPart("files") MultipartFile[] files,
-            @Parameter(description = "文件类型") @RequestParam(required = false) String type) {
+            @Parameter(description = "文件类型", example = "image") @RequestParam(required = false) String type) {
         List<Map<String, Object>> results = new ArrayList<>();
         for (MultipartFile file : files) {
             Map<String, Object> info = new HashMap<>();
@@ -243,9 +243,9 @@ public class UserController {
     public Result<Map<String, Object>> uploadWithData(
             @Parameter(description = "文件", required = true)
             @RequestPart("file") MultipartFile file,
-            @Parameter(description = "用户名") @RequestParam String username,
-            @Parameter(description = "邮箱") @RequestParam(required = false) String email,
-            @Parameter(description = "是否公开") @RequestParam(defaultValue = "false") Boolean isPublic) {
+            @Parameter(description = "用户名", example = "zhangsan") @RequestParam String username,
+            @Parameter(description = "邮箱", example = "zhangsan@example.com") @RequestParam(required = false) String email,
+            @Parameter(description = "是否公开", example = "true") @RequestParam(defaultValue = "false") Boolean isPublic) {
         Map<String, Object> result = new HashMap<>();
         result.put("fileName", file.getOriginalFilename());
         result.put("fileSize", file.getSize());

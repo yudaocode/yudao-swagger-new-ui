@@ -7,10 +7,10 @@ import lombok.Data;
 @Schema(description = "统一返回结果")
 public class Result<T> {
 
-    @Schema(description = "状态码")
+    @Schema(description = "状态码", example = "200")
     private Integer code;
 
-    @Schema(description = "消息")
+    @Schema(description = "消息", example = "success")
     private String message;
 
     @Schema(description = "数据")
