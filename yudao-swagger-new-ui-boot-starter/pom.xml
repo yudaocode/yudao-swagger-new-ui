@@ -6,7 +6,7 @@
 
     <groupId>cn.coget</groupId>
     <artifactId>yudao-swagger-new-ui-boot-starter</artifactId>
-    <version>1.0.3-RELEASE</version>
+    <version>1.0.4-RELEASE</version>
     <packaging>jar</packaging>
 
     <name>yudao-swagger-new-ui-boot-starter</name>
