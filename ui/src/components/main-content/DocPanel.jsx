@@ -62,11 +62,15 @@ function DocPanel({
                             {param.resolvedSchema?.$ref
                               ? param.resolvedSchema.$ref.replace('#/components/schemas/', '')
                               : param.resolvedSchema?.type || 'string'}
+                            {param.resolvedSchema?.format && ` (${param.resolvedSchema.format})`}
                           </span>
                         </div>
                         <div className="param-col-right">
                           <span className="param-desc">{param.description || ''}</span>
-                          {param.required && <span className="param-meta">required</span>}
+                          {(param.example !== undefined && param.example !== null && param.example !== '' ||
+                            param.resolvedSchema?.example !== undefined && param.resolvedSchema?.example !== null && param.resolvedSchema?.example !== '') && (
+                            <span className="param-example">示例：{param.example !== undefined ? param.example : param.resolvedSchema?.example}</span>
+                          )}
                         </div>
                       </div>
                       {/* If parameter has a complex schema, show its properties */}
@@ -144,8 +148,8 @@ function DocPanel({
                     </div>
                     <div className="param-col-right">
                       <span className="param-desc">{fieldSchema.description || ''}</span>
-                      {multipartSchema.required?.includes(fieldName) && (
-                        <span className="param-meta">required</span>
+                      {fieldSchema.example !== undefined && fieldSchema.example !== null && fieldSchema.example !== '' && (
+                        <span className="param-example">示例：{fieldSchema.example}</span>
                       )}
                     </div>
                   </div>

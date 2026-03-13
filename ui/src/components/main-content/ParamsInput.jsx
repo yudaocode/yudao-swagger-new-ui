@@ -14,6 +14,7 @@ function getSchemaProperties(schema) {
       schema: prop,
       required: schema.required?.includes(key) || false,
       description: prop.description || '',
+      example: prop.example,
     }))
   }
 
@@ -142,7 +143,7 @@ function ParamsInput({ groupedParams, paramValues, onParamChange }) {
                             <input
                               type={inputType}
                               className="param-input"
-                              placeholder={prop.description || ''}
+                              placeholder={prop.example !== undefined && prop.example !== null && prop.example !== '' ? `示例：${prop.example}` : prop.description || ''}
                               value={paramValues[`${paramType}_${param.name}.${prop.name}`] || ''}
                               onChange={(e) => onParamChange(paramType, `${param.name}.${prop.name}`, e.target.value)}
                             />
@@ -183,7 +184,7 @@ function ParamsInput({ groupedParams, paramValues, onParamChange }) {
                     <input
                       type={inputType}
                       className="param-input"
-                      placeholder={param.description || ''}
+                      placeholder={(param.example !== undefined && param.example !== null && param.example !== '' || resolvedSchema?.example !== undefined && resolvedSchema?.example !== null && resolvedSchema?.example !== '') ? `示例：${param.example !== undefined ? param.example : resolvedSchema?.example}` : param.description || ''}
                       value={paramValues[`${paramType}_${param.name}`] || ''}
                       onChange={(e) => onParamChange(paramType, param.name, e.target.value)}
                     />

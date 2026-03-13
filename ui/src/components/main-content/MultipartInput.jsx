@@ -63,6 +63,7 @@ function MultipartInput({ schema, paramValues, onParamChange }) {
     schema: prop,
     required: schema.required?.includes(key) || false,
     description: prop.description || '',
+    example: prop.example,
   }))
 
   return (
@@ -122,7 +123,7 @@ function MultipartInput({ schema, paramValues, onParamChange }) {
                 <input
                   type={inputType}
                   className="param-input"
-                  placeholder={prop.description || ''}
+                  placeholder={prop.example !== undefined && prop.example !== null && prop.example !== '' ? `示例：${prop.example}` : prop.description || ''}
                   value={paramValues[`body_${prop.name}`] || ''}
                   onChange={(e) => onParamChange('body', prop.name, e.target.value)}
                 />
