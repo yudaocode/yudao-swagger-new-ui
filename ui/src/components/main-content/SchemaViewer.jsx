@@ -120,6 +120,7 @@ function SchemaViewer({ schema, prefix = '', level = 0 }) {
                                prop.$ref
 
       if (hasNestedContent) {
+        const hasExample = prop.example !== undefined && prop.example !== null && prop.example !== ''
         elements.push(
           <React.Fragment key={displayName}>
             <div className="param-row" style={{ paddingLeft: `${childLevel * 16}px` }}>
@@ -135,13 +136,14 @@ function SchemaViewer({ schema, prefix = '', level = 0 }) {
               </div>
               <div className="param-col-right">
                 <span className="param-desc">{prop.description || ''}</span>
-                {required && <span className="param-meta">required</span>}
+                {hasExample && <span className="param-example">示例：{prop.example}</span>}
               </div>
             </div>
             <SchemaViewer schema={prop} prefix="" level={childLevel} />
           </React.Fragment>
         )
       } else {
+        const hasExample = prop.example !== undefined && prop.example !== null && prop.example !== ''
         elements.push(
           <div key={displayName} className="param-row" style={{ paddingLeft: `${childLevel * 16}px` }}>
             <div className="param-col-left">
@@ -156,7 +158,7 @@ function SchemaViewer({ schema, prefix = '', level = 0 }) {
             </div>
             <div className="param-col-right">
               <span className="param-desc">{prop.description || ''}</span>
-              {required && <span className="param-meta">required</span>}
+              {hasExample && <span className="param-example">示例：{prop.example}</span>}
             </div>
           </div>
         )
