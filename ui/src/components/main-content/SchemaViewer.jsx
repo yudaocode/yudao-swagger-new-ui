@@ -26,9 +26,16 @@ function SchemaViewer({ schema, prefix = '', level = 0 }) {
   if (schema.type === 'array' && schema.items) {
     const items = schema.items
     const hasNestedProperties = items.properties || items.$ref
+    const isSimpleArray = !hasNestedProperties && items.type
 
     // 如果没有 prefix，这是顶层 array
     if (!prefix) {
+      // 如果是简单类型的数组（如 array of integer），不渲染任何内容
+      // 因为这种情况应该由父级 object 的属性来渲染
+      if (isSimpleArray) {
+        return null
+      }
+      
       return (
         <React.Fragment>
           {/* 显示数组类型信息 */}
@@ -47,6 +54,25 @@ function SchemaViewer({ schema, prefix = '', level = 0 }) {
           {/* 如果有嵌套属性，继续渲染 */}
           {hasNestedProperties && <SchemaViewer schema={items} prefix="" level={level} />}
         </React.Fragment>
+      )
+    }
+
+    // 有 prefix 的情况（对象的属性是数组）
+    // 对于简单类型的数组，直接在一行内显示类型信息
+    if (isSimpleArray) {
+      return (
+        <div key={`${prefix}-array`} className="param-row" style={{ paddingLeft: `${level * 16}px` }}>
+          <div className="param-col-left">
+            <span className="param-name">{prefix}</span>
+            <span className="param-type">
+              array of {items.type || 'any'}
+              {items.format && ` (${items.format})`}
+            </span>
+          </div>
+          <div className="param-col-right">
+            <span className="param-desc">{schema.description || ''}</span>
+          </div>
+        </div>
       )
     }
 
