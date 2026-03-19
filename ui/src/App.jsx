@@ -1,8 +1,9 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import './components/App.scss'
 import Sidebar from './components/Sidebar'
 import MainContent from './components/MainContent'
 import SettingsModal from './components/SettingsModal'
+import ExportModal from './components/ExportModal'
 
 function App() {
   // 从 URL 参数中读取初始选中的 endpoint
@@ -21,6 +22,7 @@ function App() {
   })
   const [isDragging, setIsDragging] = useState(false)
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
+  const [isExportOpen, setIsExportOpen] = useState(false)
   const [authToken, setAuthToken] = useState(() => {
     return localStorage.getItem('authToken') || ''
   })
@@ -363,6 +365,7 @@ function App() {
         onToggleTheme={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
         authToken={authToken}
         onOpenSettings={() => setIsSettingsOpen(true)}
+        onOpenExport={() => setIsExportOpen(true)}
         hasApiData={!!apiData}
         error={error}
         onRetry={fetchApiData}
@@ -375,6 +378,11 @@ function App() {
         baseUrl={settingsBaseUrl}
         apiPath={settingsApiPath}
         onSaveSettings={handleSaveSettings}
+      />
+      <ExportModal
+        isOpen={isExportOpen}
+        onClose={() => setIsExportOpen(false)}
+        apiData={apiData}
       />
     </div>
   )

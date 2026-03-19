@@ -4,6 +4,7 @@ import { DocPanel, TryItPanel } from './main-content'
 import SunIcon from './icons/SunIcon'
 import MoonIcon from './icons/MoonIcon'
 import SettingsIcon from './icons/SettingsIcon'
+import ExportIcon from './icons/ExportIcon'
 import './MainContent.scss'
 
 /**
@@ -125,7 +126,7 @@ function validateRequiredParams(paramValues, params, resolveSchema, requestBody,
  * 主内容组件
  * 展示 API 端点的详细信息和测试功能
  */
-function MainContent({ endpoint, operation, apiData, theme, onToggleTheme, authToken, onOpenSettings, hasApiData, error, onRetry }) {
+function MainContent({ endpoint, operation, apiData, theme, onToggleTheme, authToken, onOpenSettings, onOpenExport, hasApiData, error, onRetry }) {
   const [collapsedSections, setCollapsedSections] = useState({
     parameters: false,
     requestBody: false,
@@ -295,7 +296,7 @@ function MainContent({ endpoint, operation, apiData, theme, onToggleTheme, authT
   if (!hasApiData) {
     return (
       <main className="main-content">
-        <ToolBar theme={theme} onToggleTheme={onToggleTheme} onOpenSettings={onOpenSettings} />
+        <ToolBar theme={theme} onToggleTheme={onToggleTheme} onOpenSettings={onOpenSettings} onOpenExport={onOpenExport} hasApiData={hasApiData} />
         <div className="content-empty-state">
           <svg className="empty-icon-large" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <circle cx="12" cy="12" r="10"></circle>
@@ -349,7 +350,7 @@ function MainContent({ endpoint, operation, apiData, theme, onToggleTheme, authT
   if (!operation) {
     return (
       <main className="main-content">
-        <ToolBar theme={theme} onToggleTheme={onToggleTheme} onOpenSettings={onOpenSettings} />
+        <ToolBar theme={theme} onToggleTheme={onToggleTheme} onOpenSettings={onOpenSettings} onOpenExport={onOpenExport} hasApiData={hasApiData} />
         <div className="content-header">
           <p className="endpoint-desc">Select an endpoint from the sidebar</p>
         </div>
@@ -359,7 +360,7 @@ function MainContent({ endpoint, operation, apiData, theme, onToggleTheme, authT
 
   return (
     <main className="main-content">
-      <ToolBar theme={theme} onToggleTheme={onToggleTheme} onOpenSettings={onOpenSettings} />
+      <ToolBar theme={theme} onToggleTheme={onToggleTheme} onOpenSettings={onOpenSettings} onOpenExport={onOpenExport} hasApiData={hasApiData} />
 
       {/* Endpoint Header */}
       <div className="content-header">
@@ -426,7 +427,7 @@ function MainContent({ endpoint, operation, apiData, theme, onToggleTheme, authT
 /**
  * 工具栏组件
  */
-function ToolBar({ theme, onToggleTheme, onOpenSettings }) {
+function ToolBar({ theme, onToggleTheme, onOpenSettings, onOpenExport, hasApiData }) {
   return (
     <div className="content-toolbar">
       <button className="toolbar-btn theme-toggle" onClick={onToggleTheme} aria-label="Toggle theme">
@@ -436,6 +437,11 @@ function ToolBar({ theme, onToggleTheme, onOpenSettings }) {
           <MoonIcon className="toolbar-icon" />
         )}
       </button>
+      {hasApiData && (
+        <button className="toolbar-btn export-btn" onClick={onOpenExport} aria-label="Export">
+          <ExportIcon className="toolbar-icon" />
+        </button>
+      )}
       <button className="toolbar-btn settings-btn" onClick={onOpenSettings} aria-label="Settings">
         <SettingsIcon className="toolbar-icon" />
       </button>
