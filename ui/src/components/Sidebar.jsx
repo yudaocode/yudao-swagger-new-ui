@@ -2,7 +2,11 @@ import React, { useState, useMemo, useRef, useEffect } from 'react'
 import './Sidebar.scss'
 
 function Sidebar({ endpoints, selectedEndpoint, onSelectEndpoint, apiInfo, width, groups, selectedGroup, onSelectGroup, hasApiData, error, onRetry, onOpenSettings }) {
-  const [searchTerm, setSearchTerm] = useState('')
+  // 从 URL 参数中读取初始搜索词
+  const [searchTerm, setSearchTerm] = useState(() => {
+    const urlParams = new URLSearchParams(window.location.search)
+    return urlParams.get('search') || ''
+  })
   const [isGroupMenuOpen, setIsGroupMenuOpen] = useState(false)
   const groupMenuRef = useRef(null)
 
@@ -18,6 +22,18 @@ function Sidebar({ endpoints, selectedEndpoint, onSelectEndpoint, apiInfo, width
   }, [])
 
   const currentGroup = groups?.find(g => g.name === selectedGroup)
+
+  // 当搜索词变化时，更新 URL 参数
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search)
+    if (searchTerm) {
+      urlParams.set('search', searchTerm)
+    } else {
+      urlParams.delete('search')
+    }
+    const newUrl = `${window.location.pathname}${urlParams.toString() ? '?' + urlParams.toString() : ''}${window.location.hash}`
+    window.history.replaceState(null, '', newUrl)
+  }, [searchTerm])
 
   const handleSelectGroup = (groupName) => {
     onSelectGroup(groupName)
@@ -109,7 +125,10 @@ function Sidebar({ endpoints, selectedEndpoint, onSelectEndpoint, apiInfo, width
           {searchTerm && (
             <button
               className="search-clear"
-              onClick={() => setSearchTerm('')}
+              onClick={() => {
+                setSearchTerm('')
+                // 清空搜索词时，URL 参数已在 useEffect 中更新
+              }}
               aria-label="Clear search"
             >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
