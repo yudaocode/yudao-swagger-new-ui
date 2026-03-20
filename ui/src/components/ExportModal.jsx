@@ -1,15 +1,36 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo, useRef } from 'react'
 import './ExportModal.scss'
 import { exportJson } from './export/exportJson'
 import { exportHtml } from './export/exportHtml'
 import { exportMarkdown } from './export/exportMarkdown'
+import { exportWord } from './export/exportWord'
 
 const EXPORT_FORMATS = [
   { id: 'json', label: 'JSON', description: 'OpenAPI JSON format', enabled: true },
   { id: 'html', label: 'HTML', description: 'HTML documentation', enabled: true },
-  { id: 'word', label: 'Word', description: 'Microsoft Word document', enabled: false },
+  { id: 'word', label: 'Word', description: 'Microsoft Word document', enabled: true },
   { id: 'markdown', label: 'Markdown', description: 'Markdown documentation', enabled: true },
 ]
+
+// 自定义 Checkbox 组件，支持 indeterminate 状态
+function IndeterminateCheckbox({ checked, indeterminate, onChange }) {
+  const checkboxRef = useRef(null)
+
+  useEffect(() => {
+    if (checkboxRef.current) {
+      checkboxRef.current.indeterminate = indeterminate
+    }
+  }, [indeterminate])
+
+  return (
+    <input
+      ref={checkboxRef}
+      type="checkbox"
+      checked={checked}
+      onChange={onChange}
+    />
+  )
+}
 
 function ExportModal({ isOpen, onClose, apiData }) {
   const [selectedEndpoints, setSelectedEndpoints] = useState(new Set())
@@ -143,19 +164,28 @@ function ExportModal({ isOpen, onClose, apiData }) {
   }
 
   const handleExport = () => {
-    if (!apiData) return
+    if (!apiData) {
+      console.error('No API data available')
+      return
+    }
     
     const selectedKeys = Array.from(selectedEndpoints)
+    console.log('Exporting...', { format: selectedFormat, selectedKeys })
     
-    if (selectedFormat === 'json') {
-      exportJson(selectedKeys, apiData)
-    } else if (selectedFormat === 'markdown') {
-      exportMarkdown(selectedKeys, apiData)
-    } else if (selectedFormat === 'html') {
-      exportHtml(selectedKeys, apiData)
+    try {
+      if (selectedFormat === 'json') {
+        exportJson(selectedKeys, apiData)
+      } else if (selectedFormat === 'markdown') {
+        exportMarkdown(selectedKeys, apiData)
+      } else if (selectedFormat === 'html') {
+        exportHtml(selectedKeys, apiData)
+      } else if (selectedFormat === 'word') {
+        exportWord(selectedKeys, apiData)
+      }
+      onClose()
+    } catch (error) {
+      console.error('Export failed:', error)
     }
-
-    onClose()
   }
 
   const handleOverlayClick = (e) => {
@@ -288,8 +318,7 @@ function ExportModal({ isOpen, onClose, apiData }) {
                             </svg>
                           </button>
                           <label className="export-checkbox-label">
-                            <input
-                              type="checkbox"
+                            <IndeterminateCheckbox
                               checked={allTagSelected}
                               indeterminate={someTagSelected && !allTagSelected}
                               onChange={() => handleToggleTag(tag)}
@@ -381,7 +410,7 @@ function ExportModal({ isOpen, onClose, apiData }) {
           <button 
             className="modal-btn modal-btn-save" 
             onClick={handleExport}
-            disabled={selectedEndpoints.size === 0 || (selectedFormat !== 'json' && selectedFormat !== 'markdown' && selectedFormat !== 'html')}
+            disabled={selectedEndpoints.size === 0}
           >
             Export {selectedFormat.toUpperCase()}
           </button>
