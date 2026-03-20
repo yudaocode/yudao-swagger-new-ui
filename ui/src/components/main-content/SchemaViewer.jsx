@@ -27,6 +27,7 @@ function SchemaViewer({ schema, prefix = '', level = 0 }) {
     const items = schema.items
     const hasNestedProperties = items.properties || items.$ref
     const isSimpleArray = !hasNestedProperties && items.type
+    const isObjectArray = hasNestedProperties && (items.type === 'object' || items.properties)
 
     // 如果没有 prefix，这是顶层 array
     if (!prefix) {
@@ -36,6 +37,11 @@ function SchemaViewer({ schema, prefix = '', level = 0 }) {
         return null
       }
       
+      // 如果是对象数组，直接渲染对象的属性，不渲染额外的 "items" 行
+      if (isObjectArray) {
+        return <SchemaViewer schema={items} prefix="" level={level} />
+      }
+
       return (
         <React.Fragment>
           {/* 显示数组类型信息 */}
@@ -76,18 +82,23 @@ function SchemaViewer({ schema, prefix = '', level = 0 }) {
       )
     }
 
+    // 对于对象数组，渲染数组类型行，然后渲染对象属性（不渲染额外的 "items" 行）
     return (
       <React.Fragment key={`${prefix}-array`}>
         <div className="param-row" style={{ paddingLeft: `${level * 16}px` }}>
           <div className="param-col-left">
             <span className="param-name">{prefix}</span>
-            <span className="param-type">array</span>
+            <span className="param-type">
+              array of object
+              {items.$ref && ` (${items.$ref.replace('#/components/schemas/', '')})`}
+            </span>
           </div>
           <div className="param-col-right">
             <span className="param-desc">{schema.description || ''}</span>
           </div>
         </div>
-        {hasNestedProperties && <SchemaViewer schema={items} prefix="" level={level + 1} />}
+        {/* 直接渲染对象属性，不渲染额外的 "items" 行 */}
+        <SchemaViewer schema={items} prefix="" level={level + 1} />
       </React.Fragment>
     )
   }

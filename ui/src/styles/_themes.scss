@@ -14,6 +14,8 @@
   --accent-info: #{$accent-info};
   --accent-warning: #{$accent-warning};
   --accent-error: #{$accent-error};
+  --scrollbar-thumb: #{$dark-scrollbar-thumb};
+  --scrollbar-thumb-hover: #{$dark-scrollbar-thumb-hover};
 
   /* Code Highlight Colors - Dark Theme (One Dark Pro) */
   --hljs-keyword: #{$dark-hljs-keyword};
@@ -42,6 +44,8 @@
   --accent-info: #{$light-accent-info};
   --accent-warning: #{$light-accent-warning};
   --accent-error: #{$light-accent-error};
+  --scrollbar-thumb: #{$light-scrollbar-thumb};
+  --scrollbar-thumb-hover: #{$light-scrollbar-thumb-hover};
 
   /* Code Highlight Colors - Light Theme (GitHub Style) */
   --hljs-keyword: #{$light-hljs-keyword};
