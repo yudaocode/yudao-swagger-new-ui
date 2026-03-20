@@ -61,7 +61,7 @@ body {
 
 #root { min-height: 100vh; }
 
-/* Global Scrollbar Styles */
+/* Global Scrollbar Styles with Auto-Hide */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -72,17 +72,33 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--scrollbar-thumb);
+  background: transparent;
   border-radius: 4px;
+  transition: background 0.3s ease;
+}
+
+/* Show scrollbar on hover or when scrolling */
+:hover::-webkit-scrollbar-thumb,
+:active::-webkit-scrollbar-thumb,
+:focus::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--scrollbar-thumb-hover);
 }
 
-/* Firefox scrollbar */
+/* Firefox scrollbar with auto-hide */
 * {
   scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  transition: scrollbar-color 0.3s ease;
+}
+
+/* Show Firefox scrollbar on hover */
+*:hover,
+*:active,
+*:focus {
   scrollbar-color: var(--scrollbar-thumb) transparent;
 }
 
