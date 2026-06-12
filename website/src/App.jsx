@@ -29,7 +29,7 @@ function App() {
       <Navbar theme={theme} onToggleTheme={toggleTheme} />
       <main className="main">
         <Routes>
-          <Route path="/" element={<HomePage />} />
+          <Route path="/" element={<HomePage theme={theme} />} />
           <Route path="/docs" element={<DocsPage />} />
         </Routes>
       </main>

@@ -1,8 +1,9 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { highlightCode } from '../utils/highlight'
 import './HomePage.scss'
 
-function HomePage() {
+function HomePage({ theme }) {
   const iframeRef = useRef(null)
 
   const syncThemeToIframe = () => {
@@ -10,7 +11,6 @@ function HomePage() {
       if (!iframeRef.current) return
       const doc = iframeRef.current.contentDocument
       if (!doc) return
-      const theme = document.documentElement.getAttribute('data-theme')
       if (theme === 'light') {
         doc.documentElement.setAttribute('data-theme', 'light')
       } else {
@@ -18,6 +18,11 @@ function HomePage() {
       }
     }, 500)
   }
+
+  // 主题变化时同步到 iframe
+  useEffect(() => {
+    syncThemeToIframe()
+  }, [theme])
 
   return (
     <div className="home-page">
@@ -47,6 +52,28 @@ function HomePage() {
                 <span className="hero-btn-prefix">$</span>
                 quick_start
               </Link>
+              <a
+                href="https://gitcode.com/yudaocode/yudao-swagger-new-ui"
+                className="hero-btn hero-btn-ghost"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h-2v-2h2v2zm0-4h-2V7h2v6zm4 4h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                </svg>
+                GitCode
+              </a>
+              <a
+                href="https://gitee.com/yudaocode/yudao-swagger-new-ui"
+                className="hero-btn hero-btn-ghost"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+                  <path d="M11.984 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.016 0zm6.09 5.333c.328 0 .593.266.593.593v1.482a.594.594 0 0 1-.593.592H9.777c-.982 0-1.778.796-1.778 1.778v5.926c0 .327.266.592.593.592h5.185c.328 0 .593-.265.593-.592v-2.37a.593.593 0 0 0-.593-.593h-2.963a.593.593 0 0 1-.593-.592v-1.482a.593.593 0 0 1 .593-.592h5.926c.327 0 .592.265.592.592v6.815a.593.593 0 0 1-.592.593H6.222a.593.593 0 0 1-.593-.593V9.778a5.333 5.333 0 0 1 5.334-5.333h7.11z"/>
+                </svg>
+                Gitee
+              </a>
               <a
                 href="https://github.com/yudaocode/yudao-swagger-new-ui"
                 className="hero-btn hero-btn-ghost"
@@ -162,7 +189,7 @@ function HomePage() {
     <type>pom</type>
 </dependency>`} />
                   </div>
-                  <pre><code dangerouslySetInnerHTML={{ __html: highlightXml(`<dependency>
+                  <pre><code dangerouslySetInnerHTML={{ __html: highlightCode(`, 'xml'<dependency>
     <groupId>cn.coget</groupId>
     <artifactId>yudao-swagger-new-ui-boot-starter</artifactId>
     <version>1.0.5-RELEASE</version>
@@ -186,7 +213,7 @@ function HomePage() {
     <version>2.8.4</version>
 </dependency>`} />
                   </div>
-                  <pre><code dangerouslySetInnerHTML={{ __html: highlightXml(`<!-- Spring Boot 3.x -->
+                  <pre><code dangerouslySetInnerHTML={{ __html: highlightCode(`, 'xml'<!-- Spring Boot 3.x -->
 <dependency>
     <groupId>org.springdoc</groupId>
     <artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
@@ -265,6 +292,22 @@ function HomePage() {
               get_started
             </Link>
             <a
+              href="https://gitcode.com/yudaocode/yudao-swagger-new-ui"
+              className="hero-btn hero-btn-ghost hero-btn-lg"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              ⭐ Star on GitCode
+            </a>
+            <a
+              href="https://gitee.com/yudaocode/yudao-swagger-new-ui"
+              className="hero-btn hero-btn-ghost hero-btn-lg"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              ⭐ Star on Gitee
+            </a>
+            <a
               href="https://github.com/yudaocode/yudao-swagger-new-ui"
               className="hero-btn hero-btn-ghost hero-btn-lg"
               target="_blank"
@@ -277,50 +320,6 @@ function HomePage() {
       </section>
     </div>
   )
-}
-
-/**
- * 简易 XML 语法高亮
- * - 注释 (<!-- ... -->)  → 灰色斜体
- * - 标签名 (<dependency>, </dependency>) → 绿色
- * - 属性名 → 紫色
- * - 文本内容 / 属性值 → 琥珀色
- */
-function highlightXml(xml) {
-  // 先转义 HTML 实体
-  const escaped = xml
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-
-  // 1. 注释
-  let result = escaped.replace(
-    /(&lt;!--[\s\S]*?--&gt;)/g,
-    '<span class="hl-comment">$1</span>'
-  )
-
-  // 2. 自闭合标签 & 普通标签
-  //    匹配 <tag attr="val"> 或 </tag>
-  result = result.replace(
-    /(&lt;\/?)([\w:-]+)((?:\s+[\s\S]*?)?)(\/?&gt;)/g,
-    (match, open, tag, attrs, close) => {
-      let attrStr = attrs
-      // 高亮属性名="属性值"
-      attrStr = attrStr.replace(
-        /([\w:-]+)(=)(&quot;|"|')(.*?)\3/g,
-        '<span class="hl-attr">$1</span>$2<span class="hl-val">$3$4$3</span>'
-      )
-      return `${open}<span class="hl-tag">${tag}</span>${attrStr}${close}`
-    }
-  )
-
-  // 3. 标签之间的文本内容（简单处理：每行缩进后到 &lt; 之前的内容）
-  result = result.replace(
-    /^(\s*)([^&<\n][^<\n]*?)(&lt;)/gm,
-    '$1<span class="hl-val">$2</span>$3'
-  )
-
-  return result
 }
 
 function CopyButton({ text }) {
