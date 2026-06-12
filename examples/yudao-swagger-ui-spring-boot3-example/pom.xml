@@ -19,7 +19,7 @@
         <!-- Spring Boot 3 需要 Java 17+，这里使用 JDK 21 -->
         <java.version>21</java.version>
         <lombok.version>1.18.30</lombok.version>
-        <yudao-swagger-new-ui-boot-starter.version>1.0.3-RELEASE</yudao-swagger-new-ui-boot-starter.version>
+        <yudao-swagger-new-ui-boot-starter.version>1.0.5-RELEASE</yudao-swagger-new-ui-boot-starter.version>
     </properties>
 
     <dependencies>

@@ -1,31 +1,33 @@
 #!/usr/bin/env node
 
 /**
- * 同步 UI 构建产物到官网
+ * 构建 UI 并同步到官网
  *
  * 使用方式：
- *   1. 先构建 UI：cd ui && npm run build:java
- *   2. 运行此脚本：node scripts/sync-ui-to-website.js
+ *   cd website && npm run build:ui
  *
  * 脚本会：
- *   - 清空 website/public/new-ui/assets/
- *   - 复制 ui/dist/assets/* → website/public/new-ui/assets/
- *   - 复制 ui/dist/favicon-green.svg → website/public/new-ui/
- *   - 读取 ui/dist/index.html 获取新的资源文件名
- *   - 重新生成 embed.html（包含 Mock API 数据）
+ *   1. 进入 ui/ 目录执行 npm run build:java 构建
+ *   2. 清空 website/public/new-ui/assets/
+ *   3. 复制 ui/dist/assets/* → website/public/new-ui/assets/
+ *   4. 复制 ui/dist/favicon-green.svg → website/public/new-ui/
+ *   5. 读取 ui/dist/index.html 获取新的资源文件名
+ *   6. 重新生成 embed.html（包含 Mock API 数据）
  */
 
+const { execSync } = require('child_process')
 const fs = require('fs')
 const path = require('path')
 
 // ============================================================
 //  配置
 // ============================================================
-const ROOT = path.resolve(__dirname, '..')
-const UI_DIST = path.join(ROOT, 'ui', 'dist')
-const WEBSITE_NEW_UI = path.join(ROOT, 'website', 'public', 'new-ui')
+const ROOT = path.resolve(__dirname, '..', '..')
+const UI_DIR = path.join(ROOT, 'ui')
+const UI_DIST = path.join(UI_DIR, 'dist')
+const WEBSITE_NEW_UI = path.join(__dirname, '..', 'public', 'new-ui')
 const WEBSITE_ASSETS = path.join(WEBSITE_NEW_UI, 'assets')
-const MOCK_DATA_FILE = path.join(ROOT, 'website', 'public', 'new-ui', 'mock-api-data.json')
+const MOCK_DATA_FILE = path.join(WEBSITE_NEW_UI, 'mock-api-data.json')
 
 // ============================================================
 //  工具函数
@@ -64,17 +66,33 @@ function clearDir(dir) {
 }
 
 // ============================================================
-//  主流程
+//  1. 构建 UI
 // ============================================================
-console.log('🔄 开始同步 UI 构建产物到官网...\n')
+console.log('🔨 构建 UI 项目...\n')
 
-// 1. 检查 ui/dist 是否存在
-if (!fs.existsSync(UI_DIST)) {
-  console.error('❌ ui/dist 目录不存在！请先运行: cd ui && npm run build:java')
+try {
+  execSync('npm run build:java', {
+    cwd: UI_DIR,
+    stdio: 'inherit',
+  })
+} catch (err) {
+  console.error('\n❌ UI 构建失败！')
   process.exit(1)
 }
 
-// 2. 解析 index.html 获取资源文件名
+console.log('\n✅ UI 构建完成\n')
+
+// ============================================================
+//  2. 检查 ui/dist 是否存在
+// ============================================================
+if (!fs.existsSync(UI_DIST)) {
+  console.error('❌ ui/dist 目录不存在！构建可能失败了')
+  process.exit(1)
+}
+
+// ============================================================
+//  3. 解析 index.html 获取资源文件名
+// ============================================================
 const indexHtml = fs.readFileSync(path.join(UI_DIST, 'index.html'), 'utf8')
 const cssMatch = indexHtml.match(/href="\.\/assets\/([^"]+\.css)"/)
 const jsMatch = indexHtml.match(/src="\.\/assets\/([^"]+\.js)"/)
@@ -90,29 +108,33 @@ console.log(`📦 检测到资源文件:`)
 console.log(`   CSS: ${cssFile}`)
 console.log(`   JS:  ${jsFile}\n`)
 
-// 3. 清空并复制 assets
+// ============================================================
+//  4. 清空并复制 assets
+// ============================================================
 console.log('📁 同步 assets 目录...')
 clearDir(WEBSITE_ASSETS)
 copyDir(path.join(UI_DIST, 'assets'), WEBSITE_ASSETS)
 console.log('   ✅ assets 已同步\n')
 
-// 4. 复制 favicon
+// ============================================================
+//  5. 复制 favicon
+// ============================================================
 const faviconSrc = path.join(UI_DIST, 'favicon-green.svg')
 if (fs.existsSync(faviconSrc)) {
   fs.copyFileSync(faviconSrc, path.join(WEBSITE_NEW_UI, 'favicon-green.svg'))
   console.log('✅ favicon-green.svg 已复制\n')
 }
 
-// 5. 生成 embed.html
+// ============================================================
+//  6. 生成 embed.html
+// ============================================================
 console.log('📝 生成 embed.html...')
 
-// 读取 Mock 数据（如果 mock-api-data.json 存在就用它，否则用默认的 Pet Store 示例）
 let mockDataJson
 if (fs.existsSync(MOCK_DATA_FILE)) {
   mockDataJson = fs.readFileSync(MOCK_DATA_FILE, 'utf8')
   console.log('   📄 使用 mock-api-data.json 作为 Mock 数据')
 } else {
-  // 内置默认 Mock 数据
   mockDataJson = JSON.stringify({
     openapi: "3.0.1",
     info: { title: "Swagger UI 示例 API", description: "Spring Boot 3.x SpringDoc OpenAPI 示例", version: "1.0" },
@@ -175,11 +197,13 @@ const embedHtml = `<!doctype html>
 fs.writeFileSync(path.join(WEBSITE_NEW_UI, 'embed.html'), embedHtml)
 console.log('   ✅ embed.html 已生成\n')
 
-// 6. 也复制一份 index.html（供全屏预览使用）
+// ============================================================
+//  7. 复制 index.html
+// ============================================================
 fs.copyFileSync(path.join(UI_DIST, 'index.html'), path.join(WEBSITE_NEW_UI, 'index.html'))
 console.log('   ✅ index.html 已复制\n')
 
-console.log('🎉 同步完成！')
+console.log('🎉 全部完成！UI 已构建并同步到官网')
 console.log('\n💡 后续步骤:')
-console.log('   1. cd website && npm run dev  — 预览效果')
-console.log('   2. git add website/public/new-ui/ && git commit  — 提交更新')
+console.log('   npm run dev       — 预览官网效果')
+console.log('   npm run build     — 构建官网')
