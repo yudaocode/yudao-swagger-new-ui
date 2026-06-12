@@ -6,7 +6,7 @@ import './HomePage.scss'
 function HomePage({ theme }) {
   const iframeRef = useRef(null)
 
-  const syncThemeToIframe = () => {
+  const syncThemeToIframe = (delay = 0) => {
     setTimeout(() => {
       if (!iframeRef.current) return
       const doc = iframeRef.current.contentDocument
@@ -16,10 +16,10 @@ function HomePage({ theme }) {
       } else {
         doc.documentElement.removeAttribute('data-theme')
       }
-    }, 500)
+    }, delay)
   }
 
-  // 主题变化时同步到 iframe
+  // 主题变化时同步到 iframe（无延迟，iframe 已加载）
   useEffect(() => {
     syncThemeToIframe()
   }, [theme])
@@ -118,7 +118,7 @@ function HomePage({ theme }) {
                 src="/new-ui/embed.html"
                 className="demo-iframe"
                 title="New UI Live Demo"
-                onLoad={syncThemeToIframe}
+                onLoad={() => syncThemeToIframe(200)}
               />
             </div>
           </div>
@@ -189,12 +189,12 @@ function HomePage({ theme }) {
     <type>pom</type>
 </dependency>`} />
                   </div>
-                  <pre><code dangerouslySetInnerHTML={{ __html: highlightCode(`, 'xml'<dependency>
+                  <pre><code dangerouslySetInnerHTML={{ __html: highlightCode(`<dependency>
     <groupId>cn.coget</groupId>
     <artifactId>yudao-swagger-new-ui-boot-starter</artifactId>
     <version>1.0.5-RELEASE</version>
     <type>pom</type>
-</dependency>`) }} /></pre>
+</dependency>`, 'xml') }} /></pre>
                 </div>
               </div>
             </div>
@@ -213,12 +213,12 @@ function HomePage({ theme }) {
     <version>2.8.4</version>
 </dependency>`} />
                   </div>
-                  <pre><code dangerouslySetInnerHTML={{ __html: highlightCode(`, 'xml'<!-- Spring Boot 3.x -->
+                  <pre><code dangerouslySetInnerHTML={{ __html: highlightCode(`<!-- Spring Boot 3.x -->
 <dependency>
     <groupId>org.springdoc</groupId>
     <artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
     <version>2.8.4</version>
-</dependency>`) }} /></pre>
+</dependency>`, 'xml') }} /></pre>
                 </div>
               </div>
             </div>
