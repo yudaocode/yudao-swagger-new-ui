@@ -8,9 +8,9 @@
  *
  * 脚本会：
  *   1. 进入 ui/ 目录执行 npm run build:java 构建
- *   2. 清空 website/public/new-ui/assets/
- *   3. 复制 ui/dist/assets/* → website/public/new-ui/assets/
- *   4. 复制 ui/dist/favicon-green.svg → website/public/new-ui/
+ *   2. 清空 website/public/assets/
+ *   3. 复制 ui/dist/assets/* → website/public/assets/
+ *   4. 复制 ui/dist/favicon-green.svg → website/public/
  *   5. 读取 ui/dist/index.html 获取新的资源文件名
  *   6. 重新生成 embed.html（包含 Mock API 数据）
  */
@@ -25,9 +25,9 @@ const path = require('path')
 const ROOT = path.resolve(__dirname, '..', '..')
 const UI_DIR = path.join(ROOT, 'ui')
 const UI_DIST = path.join(UI_DIR, 'dist')
-const WEBSITE_NEW_UI = path.join(__dirname, '..', 'public', 'new-ui')
-const WEBSITE_ASSETS = path.join(WEBSITE_NEW_UI, 'assets')
-const MOCK_DATA_FILE = path.join(WEBSITE_NEW_UI, 'mock-api-data.json')
+const WEBSITE_PUBLIC = path.join(__dirname, '..', 'public')
+const WEBSITE_ASSETS = path.join(WEBSITE_PUBLIC, 'assets')
+const MOCK_DATA_FILE = path.join(WEBSITE_PUBLIC, 'mock-api-data.json')
 
 // ============================================================
 //  工具函数
@@ -121,7 +121,7 @@ console.log('   ✅ assets 已同步\n')
 // ============================================================
 const faviconSrc = path.join(UI_DIST, 'favicon-green.svg')
 if (fs.existsSync(faviconSrc)) {
-  fs.copyFileSync(faviconSrc, path.join(WEBSITE_NEW_UI, 'favicon-green.svg'))
+  fs.copyFileSync(faviconSrc, path.join(WEBSITE_PUBLIC, 'favicon-green.svg'))
   console.log('✅ favicon-green.svg 已复制\n')
 }
 
@@ -194,14 +194,8 @@ const embedHtml = `<!doctype html>
 </body>
 </html>`
 
-fs.writeFileSync(path.join(WEBSITE_NEW_UI, 'embed.html'), embedHtml)
+fs.writeFileSync(path.join(WEBSITE_PUBLIC, 'embed.html'), embedHtml)
 console.log('   ✅ embed.html 已生成\n')
-
-// ============================================================
-//  7. 复制 index.html
-// ============================================================
-fs.copyFileSync(path.join(UI_DIST, 'index.html'), path.join(WEBSITE_NEW_UI, 'index.html'))
-console.log('   ✅ index.html 已复制\n')
 
 console.log('🎉 全部完成！UI 已构建并同步到官网')
 console.log('\n💡 后续步骤:')
