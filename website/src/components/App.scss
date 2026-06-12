@@ -1,0 +1,12 @@
+@use '../styles/variables' as *;
+@use '../styles/mixins' as *;
+
+.website {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main {
+  flex: 1;
+}

@@ -1,0 +1,59 @@
+@use '../styles/variables' as *;
+@use '../styles/mixins' as *;
+
+.docs-sidebar {
+  width: 240px;
+  border-right: 1px solid var(--border-primary);
+  background-color: var(--surface-bg);
+  position: sticky;
+  top: 64px;
+  height: calc(100vh - 64px);
+  overflow-y: auto;
+  flex-shrink: 0;
+
+  @media (max-width: $bp-md) {
+    display: none;
+  }
+}
+
+.docs-sidebar-inner {
+  padding: $spacing-lg $spacing-md;
+}
+
+.sidebar-section-label {
+  font-family: $font-mono;
+  font-size: 11px;
+  color: var(--accent-green);
+  margin-bottom: $spacing-md;
+  padding: 0 $spacing-sm;
+}
+
+.sidebar-nav {
+  @include flex-col;
+  gap: 2px;
+}
+
+.sidebar-nav-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 8px 12px;
+  font-family: $font-mono;
+  font-size: 13px;
+  color: var(--text-tertiary);
+  background: none;
+  border: none;
+  border-radius: $radius-sm;
+  cursor: pointer;
+  transition: color $transition-fast, background-color $transition-fast;
+
+  &:hover {
+    color: var(--text-primary);
+    background-color: var(--input-bg);
+  }
+
+  &.active {
+    color: var(--accent-green);
+    background-color: var(--input-bg);
+  }
+}
