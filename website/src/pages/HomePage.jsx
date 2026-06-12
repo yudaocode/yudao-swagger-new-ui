@@ -48,6 +48,28 @@ function HomePage() {
                 quick_start
               </Link>
               <a
+                href="https://gitcode.com/yudaocode/yudao-swagger-new-ui"
+                className="hero-btn hero-btn-ghost"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h-2v-2h2v2zm0-4h-2V7h2v6zm4 4h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                </svg>
+                GitCode
+              </a>
+              <a
+                href="https://gitee.com/yudaocode/yudao-swagger-new-ui"
+                className="hero-btn hero-btn-ghost"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+                  <path d="M11.984 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.016 0zm6.09 5.333c.328 0 .593.266.593.593v1.482a.594.594 0 0 1-.593.592H9.777c-.982 0-1.778.796-1.778 1.778v5.926c0 .327.266.592.593.592h5.185c.328 0 .593-.265.593-.592v-2.37a.593.593 0 0 0-.593-.593h-2.963a.593.593 0 0 1-.593-.592v-1.482a.593.593 0 0 1 .593-.592h5.926c.327 0 .592.265.592.592v6.815a.593.593 0 0 1-.592.593H6.222a.593.593 0 0 1-.593-.593V9.778a5.333 5.333 0 0 1 5.334-5.333h7.11z"/>
+                </svg>
+                Gitee
+              </a>
+              <a
                 href="https://github.com/yudaocode/yudao-swagger-new-ui"
                 className="hero-btn hero-btn-ghost"
                 target="_blank"
@@ -264,6 +286,22 @@ function HomePage() {
               <span className="hero-btn-prefix">$</span>
               get_started
             </Link>
+            <a
+              href="https://gitcode.com/yudaocode/yudao-swagger-new-ui"
+              className="hero-btn hero-btn-ghost hero-btn-lg"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              ⭐ Star on GitCode
+            </a>
+            <a
+              href="https://gitee.com/yudaocode/yudao-swagger-new-ui"
+              className="hero-btn hero-btn-ghost hero-btn-lg"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              ⭐ Star on Gitee
+            </a>
             <a
               href="https://github.com/yudaocode/yudao-swagger-new-ui"
               className="hero-btn hero-btn-ghost hero-btn-lg"
