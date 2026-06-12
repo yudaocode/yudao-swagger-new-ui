@@ -56,9 +56,13 @@
 
 .hero-inner {
   @include container;
-  text-align: center;
   position: relative;
   z-index: 1;
+}
+
+.hero-head {
+  text-align: center;
+  margin-bottom: 48px;
 }
 
 .hero-tag {
@@ -163,7 +167,7 @@
   align-items: center;
   justify-content: center;
   gap: 12px;
-  margin-bottom: 64px;
+  margin-bottom: 0;
   animation: fade-in-up 0.6s ease-out 0.3s both;
 
   @media (max-width: $bp-sm) {
@@ -226,21 +230,40 @@
   font-size: 15px;
 }
 
-// Preview 截图
-.hero-preview {
-  max-width: 1100px;
-  margin: 0 auto;
+// Demo 区域 — 突破容器，全宽展示
+.hero-demo {
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
   animation: fade-in-up 0.8s ease-out 0.5s both;
+  padding: 0 48px;
+
+  @media (max-width: $bp-lg) {
+    padding: 0 32px;
+  }
+
+  @media (max-width: $bp-md) {
+    padding: 0 16px;
+  }
 }
 
-.hero-preview-bar {
+.hero-demo-bar {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 12px 16px;
+  padding: 10px 16px;
   background: var(--surface-bg);
-  border-bottom: 1px solid var(--border-primary);
+  border: 1px solid var(--border-primary);
+  border-bottom: none;
   border-radius: 12px 12px 0 0;
+}
+
+.hero-demo-dots {
+  display: flex;
+  gap: 6px;
 }
 
 .bar-dot {
@@ -252,7 +275,7 @@
   &.green { background: #22C55E; }
 }
 
-.bar-url {
+.hero-demo-url {
   flex: 1;
   text-align: center;
   font-family: $font-mono;
@@ -260,7 +283,29 @@
   color: var(--text-muted);
 }
 
-.hero-preview-body {
+.hero-demo-fullscreen {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  color: var(--text-muted);
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  &:hover {
+    color: var(--accent-green);
+    background: rgba($accent-green, 0.1);
+  }
+}
+
+.hero-demo-body {
   background: var(--surface-bg);
   border: 1px solid var(--border-primary);
   border-top: none;
@@ -271,18 +316,16 @@
     0 0 100px rgba($accent-green, 0.06);
 }
 
-.preview-img {
+// iframe 实时体验 — 宽度 100% 自适应，高度按宽高比缩放
+.demo-iframe {
   width: 100%;
-  height: auto;
+  aspect-ratio: 16 / 9;
+  min-height: 480px;
+  border: none;
   display: block;
 }
 
-.preview-img-dark { display: block; }
-.preview-img-light { display: none; }
-
 [data-theme="light"] {
-  .preview-img-dark { display: none; }
-  .preview-img-light { display: block; }
   .hero-glow { background: radial-gradient(circle, rgba(#16A34A, 0.08) 0%, transparent 60%); }
   .hero-grid {
     background-image:
@@ -294,7 +337,11 @@
     box-shadow: 0 2px 8px rgba(#16A34A, 0.2);
     &:hover { box-shadow: 0 4px 16px rgba(#16A34A, 0.3); }
   }
-  .hero-preview-body { box-shadow: 0 10px 40px rgba(0,0,0,0.08); }
+  .hero-demo-body { box-shadow: 0 10px 40px rgba(0,0,0,0.08); }
+  .hl-tag { color: #16A34A; }
+  .hl-attr { color: #9333EA; }
+  .hl-val { color: #B45309; }
+  .hl-comment { color: #6B7280; font-style: italic; }
 }
 
 // ============================================================
@@ -484,6 +531,12 @@
   line-height: 1.7;
   background: transparent;
 }
+
+// XML 语法高亮
+.hl-tag { color: #22C55E; }       // 标签名 <dependency>
+.hl-attr { color: #C084FC; }      // 属性名 如 version 等
+.hl-val { color: #F59E0B; }      // 属性值 / 文本内容
+.hl-comment { color: #525252; font-style: italic; }  // XML 注释
 
 .qs-url {
   display: inline-flex;
