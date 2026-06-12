@@ -1,0 +1,2904 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Swagger UI 示例 API",
+    "description": "Spring Boot 3.x SpringDoc OpenAPI 示例 (JDK 21)",
+    "contact": {
+      "name": "Example",
+      "email": "example@example.com"
+    },
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "Generated server url"
+    }
+  ],
+  "paths": {
+    "/api/users/{id}": {
+      "get": {
+        "tags": [
+          "用户管理"
+        ],
+        "summary": "获取用户详情",
+        "description": "根据用户ID获取用户详细信息",
+        "operationId": "getUserInfo",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "用户ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "description": "用户名",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "admin"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "获取成功",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultUserVO"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "用户不存在",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "用户管理"
+        ],
+        "summary": "更新用户",
+        "description": "更新用户信息",
+        "operationId": "updateUser",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "用户ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserUpdateDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "更新成功",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultUserVO"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "用户不存在",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "用户管理"
+        ],
+        "summary": "删除用户",
+        "description": "根据用户ID删除用户",
+        "operationId": "deleteUser",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "用户ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "删除成功"
+          },
+          "404": {
+            "description": "用户不存在",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/products/{id}": {
+      "get": {
+        "tags": [
+          "商品管理"
+        ],
+        "summary": "获取商品详情",
+        "description": "根据商品ID获取详细信息",
+        "operationId": "getProductById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "商品ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "获取成功",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultProductDTO"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "商品不存在",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "商品管理"
+        ],
+        "summary": "更新商品",
+        "description": "更新商品信息",
+        "operationId": "updateProduct",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProductDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultProductDTO"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "商品管理"
+        ],
+        "summary": "删除商品",
+        "description": "删除商品",
+        "operationId": "deleteProduct",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/orders/{id}": {
+      "get": {
+        "tags": [
+          "订单管理"
+        ],
+        "summary": "获取订单详情",
+        "description": "根据订单ID获取订单详细信息",
+        "operationId": "getOrderById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "订单ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "获取成功",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultOrderVO"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "订单不存在",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "订单管理"
+        ],
+        "summary": "更新订单",
+        "description": "更新订单信息",
+        "operationId": "updateOrder",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "订单ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrderCreateDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultOrderVO"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "订单管理"
+        ],
+        "summary": "删除订单",
+        "description": "删除指定订单（软删除）",
+        "operationId": "deleteOrder",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "订单ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/users": {
+      "get": {
+        "tags": [
+          "用户管理"
+        ],
+        "summary": "获取用户列表",
+        "description": "根据查询条件获取用户列表，支持分页",
+        "operationId": "getUsers",
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "description": "查询条件",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UserQueryDTO"
+            }
+          },
+          {
+            "name": "var1",
+            "in": "query",
+            "description": "额外参数1",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "value1"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultListUserVO"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "用户管理"
+        ],
+        "summary": "创建用户",
+        "description": "创建新用户",
+        "operationId": "createUser",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserCreateDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "创建成功",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultUserVO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/{id}/avatar": {
+      "post": {
+        "tags": [
+          "用户管理"
+        ],
+        "summary": "上传头像",
+        "description": "上传用户头像图片",
+        "operationId": "uploadAvatar",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "用户ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "头像文件"
+                  }
+                },
+                "required": [
+                  "file"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultMapStringObject"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/upload-with-data": {
+      "post": {
+        "tags": [
+          "用户管理"
+        ],
+        "summary": "上传文件和表单数据",
+        "description": "同时上传文件和提交表单数据",
+        "operationId": "uploadWithData",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "query",
+            "description": "用户名",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "zhangsan"
+          },
+          {
+            "name": "email",
+            "in": "query",
+            "description": "邮箱",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "zhangsan@example.com"
+          },
+          {
+            "name": "isPublic",
+            "in": "query",
+            "description": "是否公开",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "example": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "文件"
+                  }
+                },
+                "required": [
+                  "file"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultMapStringObject"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/upload-files": {
+      "post": {
+        "tags": [
+          "用户管理"
+        ],
+        "summary": "上传多个文件",
+        "description": "批量上传文件",
+        "operationId": "uploadFiles",
+        "parameters": [
+          {
+            "name": "type",
+            "in": "query",
+            "description": "文件类型",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "image"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "files": {
+                    "type": "array",
+                    "description": "文件列表",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  }
+                },
+                "required": [
+                  "files"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultListMapStringObject"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/multi-level": {
+      "post": {
+        "tags": [
+          "用户管理"
+        ],
+        "summary": "创建多级用户信息",
+        "description": "测试多级嵌套对象和数组的UI渲染",
+        "operationId": "createMultiLevelUser",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserMultiLevelDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "创建成功",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultUserMultiLevelDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/login": {
+      "post": {
+        "tags": [
+          "用户管理"
+        ],
+        "summary": "用户登录",
+        "description": "用户登录接口，返回用户信息",
+        "operationId": "login",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "query",
+            "description": "用户名",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "admin"
+          },
+          {
+            "name": "password",
+            "in": "query",
+            "description": "密码",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": 123456
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "登录成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Result"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "认证失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "账号被锁定",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "服务器内部错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/products": {
+      "get": {
+        "tags": [
+          "商品管理"
+        ],
+        "summary": "获取商品列表（分页）",
+        "description": "分页获取商品列表",
+        "operationId": "getProducts",
+        "parameters": [
+          {
+            "name": "pageNum",
+            "in": "query",
+            "description": "页码",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "每页数量",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "description": "商品名称",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "categoryId",
+            "in": "query",
+            "description": "分类ID",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "minPrice",
+            "in": "query",
+            "description": "最低价格",
+            "required": false,
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "maxPrice",
+            "in": "query",
+            "description": "最高价格",
+            "required": false,
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "状态",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "获取成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageResult"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "商品管理"
+        ],
+        "summary": "创建商品",
+        "description": "创建新商品",
+        "operationId": "createProduct",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProductDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultProductDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/products/batch/online": {
+      "post": {
+        "tags": [
+          "商品管理"
+        ],
+        "summary": "批量上架",
+        "description": "批量上架商品",
+        "operationId": "batchOnline",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "format": "int64"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultInteger"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/products/batch/offline": {
+      "post": {
+        "tags": [
+          "商品管理"
+        ],
+        "summary": "批量下架",
+        "description": "批量下架商品",
+        "operationId": "batchOffline",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "format": "int64"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultInteger"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/orders": {
+      "get": {
+        "tags": [
+          "订单管理"
+        ],
+        "summary": "获取订单列表",
+        "description": "根据查询条件获取订单列表，支持分页",
+        "operationId": "getOrders",
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "description": "查询条件",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/OrderQueryDTO"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "状态",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultListOrderVO"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "订单管理"
+        ],
+        "summary": "创建订单",
+        "description": "创建新订单",
+        "operationId": "createOrder",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrderCreateDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "创建成功",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultOrderVO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未登录",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/orders/{id}/refund": {
+      "post": {
+        "tags": [
+          "订单管理"
+        ],
+        "summary": "申请退款",
+        "description": "申请订单退款",
+        "operationId": "applyRefund",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "订单ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "reason",
+            "in": "query",
+            "description": "退款原因",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "amount",
+            "in": "query",
+            "description": "退款金额",
+            "required": false,
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "申请成功",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultString"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "订单状态不允许退款",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/orders/{id}/pay": {
+      "post": {
+        "tags": [
+          "订单管理"
+        ],
+        "summary": "支付订单",
+        "description": "支付指定订单",
+        "operationId": "payOrder",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "订单ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "paymentMethod",
+            "in": "query",
+            "description": "支付方式",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "payPassword",
+            "in": "query",
+            "description": "支付密码",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultString"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/orders/{id}/confirm": {
+      "post": {
+        "tags": [
+          "订单管理"
+        ],
+        "summary": "确认收货",
+        "description": "确认订单收货",
+        "operationId": "confirmOrder",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "订单ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultBoolean"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/orders/{id}/cancel": {
+      "post": {
+        "tags": [
+          "订单管理"
+        ],
+        "summary": "取消订单",
+        "description": "取消指定订单",
+        "operationId": "cancelOrder",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "订单ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "reason",
+            "in": "query",
+            "description": "取消原因",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "取消成功",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultBoolean"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "订单状态不允许取消",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "订单不存在",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/orders/calculate": {
+      "post": {
+        "tags": [
+          "订单管理"
+        ],
+        "summary": "计算订单总价",
+        "description": "计算订单总价（不创建订单）",
+        "operationId": "calculateOrderPrice",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrderCreateDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultBigDecimal"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/{id}/password": {
+      "patch": {
+        "tags": [
+          "用户管理"
+        ],
+        "summary": "修改密码",
+        "description": "用户修改密码",
+        "operationId": "changePassword",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "用户ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          },
+          {
+            "name": "oldPassword",
+            "in": "query",
+            "description": "旧密码",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "oldpass123"
+          },
+          {
+            "name": "newPassword",
+            "in": "query",
+            "description": "新密码",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "newpass456"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultBoolean"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/products/{id}/stock": {
+      "patch": {
+        "tags": [
+          "商品管理"
+        ],
+        "summary": "更新库存",
+        "description": "更新商品库存",
+        "operationId": "updateStock",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "quantity",
+            "in": "query",
+            "description": "库存变化量（正数增加，负数减少）",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultBoolean"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/orders/{id}/remark": {
+      "patch": {
+        "tags": [
+          "订单管理"
+        ],
+        "summary": "修改订单备注",
+        "description": "修改订单的备注信息",
+        "operationId": "updateRemark",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "订单ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "remark",
+            "in": "query",
+            "description": "备注内容",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultBoolean"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/{id}/roles": {
+      "get": {
+        "tags": [
+          "用户管理"
+        ],
+        "summary": "获取用户角色列表",
+        "description": "获取指定用户的所有角色",
+        "operationId": "getUserRoles",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "用户ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultListString"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/export": {
+      "get": {
+        "tags": [
+          "用户管理"
+        ],
+        "summary": "导出用户数据",
+        "description": "导出用户数据为文件",
+        "operationId": "exportUsers",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "description": "文件格式",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "xlsx"
+            },
+            "example": "xlsx"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/check-username": {
+      "get": {
+        "tags": [
+          "用户管理"
+        ],
+        "summary": "检查用户名是否存在",
+        "description": "检查用户名是否已被使用",
+        "operationId": "checkUsername",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "query",
+            "description": "用户名",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "zhangsan"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultBoolean"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/products/{id}/check-stock": {
+      "get": {
+        "tags": [
+          "商品管理"
+        ],
+        "summary": "检查库存",
+        "description": "检查商品库存是否充足",
+        "operationId": "checkStock",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "quantity",
+            "in": "query",
+            "description": "所需数量",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultBoolean"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/products/search": {
+      "get": {
+        "tags": [
+          "商品管理"
+        ],
+        "summary": "搜索商品",
+        "description": "根据关键字搜索商品",
+        "operationId": "searchProducts",
+        "parameters": [
+          {
+            "name": "keyword",
+            "in": "query",
+            "description": "关键字",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "限制数量",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultListProductDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/products/hot": {
+      "get": {
+        "tags": [
+          "商品管理"
+        ],
+        "summary": "获取热门商品",
+        "description": "获取热门商品列表",
+        "operationId": "getHotProducts",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "数量限制",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultListProductDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/orders/{id}/logistics": {
+      "get": {
+        "tags": [
+          "订单管理"
+        ],
+        "summary": "获取订单物流信息",
+        "description": "获取订单的物流跟踪信息",
+        "operationId": "getOrderLogistics",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "订单ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultListString"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/orders/user/{userId}": {
+      "get": {
+        "tags": [
+          "订单管理"
+        ],
+        "summary": "获取用户订单列表",
+        "description": "获取指定用户的所有订单",
+        "operationId": "getOrdersByUserId",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "用户ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "页码",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "每页数量",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultListOrderVO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/orders/export": {
+      "get": {
+        "tags": [
+          "订单管理"
+        ],
+        "summary": "导出订单",
+        "description": "导出订单数据",
+        "operationId": "exportOrders",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "description": "文件格式",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "xlsx"
+            }
+          },
+          {
+            "name": "startTime",
+            "in": "query",
+            "description": "开始时间",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "endTime",
+            "in": "query",
+            "description": "结束时间",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/orders/count": {
+      "get": {
+        "tags": [
+          "订单管理"
+        ],
+        "summary": "统计订单数量",
+        "description": "根据条件统计订单数量",
+        "operationId": "countOrders",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "description": "用户ID",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "状态",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "startTime",
+            "in": "query",
+            "description": "开始时间",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "endTime",
+            "in": "query",
+            "description": "结束时间",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultLong"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/orders/by-no/{orderNo}": {
+      "get": {
+        "tags": [
+          "订单管理"
+        ],
+        "summary": "根据订单号查询",
+        "description": "根据订单号精确查询订单",
+        "operationId": "getOrderByNo",
+        "parameters": [
+          {
+            "name": "orderNo",
+            "in": "path",
+            "description": "订单号",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultOrderVO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/batch": {
+      "delete": {
+        "tags": [
+          "用户管理"
+        ],
+        "summary": "批量删除用户",
+        "description": "根据用户ID列表批量删除用户，支持填写删除原因",
+        "operationId": "batchDeleteUsers",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserBatchDeleteDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "批量删除成功",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultInteger"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/orders/batch": {
+      "delete": {
+        "tags": [
+          "订单管理"
+        ],
+        "summary": "批量删除订单",
+        "description": "根据订单ID列表批量删除订单",
+        "operationId": "batchDeleteOrders",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "format": "int64"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultInteger"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ResultUserVO": {
+        "type": "object",
+        "description": "统一返回结果",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32",
+            "description": "状态码",
+            "example": 200
+          },
+          "message": {
+            "type": "string",
+            "description": "消息",
+            "example": "success"
+          },
+          "data": {
+            "$ref": "#/components/schemas/UserVO",
+            "description": "数据"
+          }
+        }
+      },
+      "UserVO": {
+        "type": "object",
+        "description": "用户信息",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "用户ID",
+            "example": 1
+          },
+          "username": {
+            "type": "string",
+            "description": "用户名",
+            "example": "admin"
+          },
+          "email": {
+            "type": "string",
+            "description": "邮箱",
+            "example": "admin@example.com"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "description": "错误响应",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32",
+            "description": "错误码",
+            "example": 400
+          },
+          "message": {
+            "type": "string",
+            "description": "错误消息",
+            "example": "Bad Request"
+          },
+          "details": {
+            "type": "string",
+            "description": "错误详情",
+            "example": "参数校验失败"
+          },
+          "timestamp": {
+            "type": "integer",
+            "format": "int64",
+            "description": "时间戳",
+            "example": 1234567890
+          }
+        }
+      },
+      "UserUpdateDTO": {
+        "type": "object",
+        "description": "用户更新请求",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "用户ID",
+            "example": 1
+          },
+          "username": {
+            "type": "string",
+            "description": "用户名",
+            "example": "zhangsan"
+          },
+          "email": {
+            "type": "string",
+            "description": "邮箱",
+            "example": "zhangsan@example.com"
+          },
+          "phone": {
+            "type": "string",
+            "description": "手机号",
+            "example": 13800138000
+          },
+          "age": {
+            "type": "integer",
+            "format": "int32",
+            "description": "年龄",
+            "example": 25
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "ResultProductDTO": {
+        "type": "object",
+        "description": "统一返回结果",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32",
+            "description": "状态码",
+            "example": 200
+          },
+          "message": {
+            "type": "string",
+            "description": "消息",
+            "example": "success"
+          },
+          "data": {
+            "$ref": "#/components/schemas/ProductDTO",
+            "description": "数据"
+          }
+        }
+      },
+      "ProductDTO": {
+        "type": "object",
+        "description": "商品信息",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "商品ID"
+          },
+          "name": {
+            "type": "string",
+            "description": "商品名称"
+          },
+          "description": {
+            "type": "string",
+            "description": "商品描述"
+          },
+          "price": {
+            "type": "number",
+            "description": "价格"
+          },
+          "stock": {
+            "type": "integer",
+            "format": "int32",
+            "description": "库存"
+          },
+          "categoryId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "分类ID"
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "description": "状态：0-下架，1-上架"
+          }
+        },
+        "required": [
+          "name",
+          "price"
+        ]
+      },
+      "ResultOrderVO": {
+        "type": "object",
+        "description": "统一返回结果",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32",
+            "description": "状态码",
+            "example": 200
+          },
+          "message": {
+            "type": "string",
+            "description": "消息",
+            "example": "success"
+          },
+          "data": {
+            "$ref": "#/components/schemas/OrderVO",
+            "description": "数据"
+          }
+        }
+      },
+      "OrderVO": {
+        "type": "object",
+        "description": "订单信息",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "订单ID"
+          },
+          "orderNo": {
+            "type": "string",
+            "description": "订单号"
+          },
+          "userId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "用户ID"
+          },
+          "amount": {
+            "type": "number",
+            "description": "订单金额"
+          },
+          "createTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "创建时间"
+          }
+        }
+      },
+      "OrderCreateDTO": {
+        "type": "object",
+        "description": "订单创建请求",
+        "properties": {
+          "userId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "用户ID",
+            "example": 1
+          },
+          "shippingAddress": {
+            "$ref": "#/components/schemas/AddressDTO",
+            "description": "收货地址"
+          },
+          "items": {
+            "type": "array",
+            "description": "订单项列表",
+            "items": {
+              "$ref": "#/components/schemas/OrderItemDTO"
+            }
+          },
+          "remark": {
+            "type": "string",
+            "description": "备注",
+            "example": "尽快发货"
+          }
+        },
+        "required": [
+          "items",
+          "shippingAddress",
+          "userId"
+        ]
+      },
+      "AddressDTO": {
+        "type": "object",
+        "description": "地址信息",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "收货人姓名",
+            "example": "张三"
+          },
+          "phone": {
+            "type": "string",
+            "description": "手机号",
+            "example": 13800138000
+          },
+          "province": {
+            "type": "string",
+            "description": "省份",
+            "example": "广东省"
+          },
+          "city": {
+            "type": "string",
+            "description": "城市",
+            "example": "深圳市"
+          },
+          "detail": {
+            "type": "string",
+            "description": "详细地址",
+            "example": "南山区科技园"
+          }
+        },
+        "required": [
+          "city",
+          "detail",
+          "name",
+          "phone",
+          "province"
+        ]
+      },
+      "OrderItemDTO": {
+        "type": "object",
+        "description": "订单项",
+        "properties": {
+          "productId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "商品ID",
+            "example": 1001
+          },
+          "productName": {
+            "type": "string",
+            "description": "商品名称",
+            "example": "iPhone 15"
+          },
+          "quantity": {
+            "type": "integer",
+            "format": "int32",
+            "description": "数量",
+            "example": 1
+          },
+          "price": {
+            "type": "number",
+            "description": "单价",
+            "example": 7999
+          }
+        },
+        "required": [
+          "price",
+          "productId",
+          "quantity"
+        ]
+      },
+      "UserQueryDTO": {
+        "type": "object",
+        "description": "用户查询请求",
+        "properties": {
+          "username": {
+            "type": "string",
+            "description": "用户名",
+            "example": "admin"
+          },
+          "pageNum": {
+            "type": "integer",
+            "format": "int32",
+            "description": "页码",
+            "example": 1
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32",
+            "description": "每页数量",
+            "example": 20
+          }
+        },
+        "required": [
+          "username"
+        ]
+      },
+      "ResultListUserVO": {
+        "type": "object",
+        "description": "统一返回结果",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32",
+            "description": "状态码",
+            "example": 200
+          },
+          "message": {
+            "type": "string",
+            "description": "消息",
+            "example": "success"
+          },
+          "data": {
+            "type": "array",
+            "description": "数据",
+            "items": {
+              "$ref": "#/components/schemas/UserVO"
+            }
+          }
+        }
+      },
+      "UserCreateDTO": {
+        "type": "object",
+        "description": "用户创建请求",
+        "properties": {
+          "username": {
+            "type": "string",
+            "description": "用户名",
+            "example": "zhangsan"
+          },
+          "password": {
+            "type": "string",
+            "description": "密码",
+            "example": 123456
+          },
+          "email": {
+            "type": "string",
+            "description": "邮箱",
+            "example": "zhangsan@example.com"
+          },
+          "phone": {
+            "type": "string",
+            "description": "手机号",
+            "example": 13800138000
+          },
+          "age": {
+            "type": "integer",
+            "format": "int32",
+            "description": "年龄",
+            "example": 25
+          }
+        },
+        "required": [
+          "password",
+          "username"
+        ]
+      },
+      "ResultMapStringObject": {
+        "type": "object",
+        "description": "统一返回结果",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32",
+            "description": "状态码",
+            "example": 200
+          },
+          "message": {
+            "type": "string",
+            "description": "消息",
+            "example": "success"
+          },
+          "data": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object"
+            },
+            "description": "数据"
+          }
+        }
+      },
+      "ResultListMapStringObject": {
+        "type": "object",
+        "description": "统一返回结果",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32",
+            "description": "状态码",
+            "example": 200
+          },
+          "message": {
+            "type": "string",
+            "description": "消息",
+            "example": "success"
+          },
+          "data": {
+            "type": "array",
+            "description": "数据",
+            "items": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      },
+      "UserMultiLevelDTO": {
+        "type": "object",
+        "description": "多级用户信息请求",
+        "properties": {
+          "userInfo": {
+            "$ref": "#/components/schemas/UserInfo",
+            "description": "用户基本信息"
+          },
+          "addresses": {
+            "type": "array",
+            "description": "用户地址列表",
+            "items": {
+              "$ref": "#/components/schemas/Address"
+            }
+          },
+          "config": {
+            "$ref": "#/components/schemas/UserConfig",
+            "description": "用户配置"
+          }
+        },
+        "required": [
+          "userInfo"
+        ]
+      },
+      "UserInfo": {
+        "type": "object",
+        "description": "用户基本信息",
+        "properties": {
+          "username": {
+            "type": "string",
+            "description": "用户名",
+            "example": "zhangsan"
+          },
+          "email": {
+            "type": "string",
+            "description": "邮箱",
+            "example": "zhangsan@example.com"
+          },
+          "profile": {
+            "$ref": "#/components/schemas/Profile",
+            "description": "个人资料"
+          }
+        },
+        "required": [
+          "username"
+        ]
+      },
+      "Profile": {
+        "type": "object",
+        "description": "个人资料",
+        "properties": {
+          "realName": {
+            "type": "string",
+            "description": "真实姓名",
+            "example": "张三"
+          },
+          "age": {
+            "type": "integer",
+            "format": "int32",
+            "description": "年龄",
+            "example": 25
+          },
+          "gender": {
+            "type": "string",
+            "description": "性别",
+            "example": "male"
+          }
+        }
+      },
+      "Address": {
+        "type": "object",
+        "description": "地址信息",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "地址类型",
+            "example": "home"
+          },
+          "detail": {
+            "$ref": "#/components/schemas/AddressDetail",
+            "description": "详细地址"
+          }
+        }
+      },
+      "AddressDetail": {
+        "type": "object",
+        "description": "地址详细信息",
+        "properties": {
+          "province": {
+            "type": "string",
+            "description": "省份",
+            "example": "北京市"
+          },
+          "city": {
+            "type": "string",
+            "description": "城市",
+            "example": "北京市"
+          },
+          "street": {
+            "type": "string",
+            "description": "街道",
+            "example": "朝阳区xxx街道"
+          },
+          "zipCode": {
+            "type": "string",
+            "description": "邮编",
+            "example": 100000
+          }
+        }
+      },
+      "UserConfig": {
+        "type": "object",
+        "description": "用户配置",
+        "properties": {
+          "enableNotification": {
+            "type": "boolean",
+            "description": "是否启用通知",
+            "example": true
+          },
+          "language": {
+            "type": "string",
+            "description": "语言设置",
+            "example": "zh-CN"
+          },
+          "theme": {
+            "type": "string",
+            "description": "主题设置",
+            "example": "dark"
+          },
+          "privacy": {
+            "$ref": "#/components/schemas/PrivacySettings",
+            "description": "隐私设置"
+          }
+        }
+      },
+      "PrivacySettings": {
+        "type": "object",
+        "description": "隐私设置",
+        "properties": {
+          "showEmail": {
+            "type": "boolean",
+            "description": "是否公开邮箱",
+            "example": false
+          },
+          "showPhone": {
+            "type": "boolean",
+            "description": "是否公开电话",
+            "example": false
+          },
+          "visibility": {
+            "type": "string",
+            "description": "谁可以查看我的信息",
+            "example": "friends"
+          }
+        }
+      },
+      "ResultUserMultiLevelDTO": {
+        "type": "object",
+        "description": "统一返回结果",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32",
+            "description": "状态码",
+            "example": 200
+          },
+          "message": {
+            "type": "string",
+            "description": "消息",
+            "example": "success"
+          },
+          "data": {
+            "$ref": "#/components/schemas/UserMultiLevelDTO",
+            "description": "数据"
+          }
+        }
+      },
+      "Result": {
+        "type": "object",
+        "description": "统一返回结果",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32",
+            "description": "状态码",
+            "example": 200
+          },
+          "message": {
+            "type": "string",
+            "description": "消息",
+            "example": "success"
+          },
+          "data": {
+            "type": "object",
+            "description": "数据"
+          }
+        }
+      },
+      "PageResult": {
+        "type": "object",
+        "description": "分页结果",
+        "properties": {
+          "list": {
+            "type": "array",
+            "description": "数据列表",
+            "items": {
+              "type": "object"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64",
+            "description": "总数"
+          },
+          "pageNum": {
+            "type": "integer",
+            "format": "int32",
+            "description": "当前页"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32",
+            "description": "每页数量"
+          },
+          "pages": {
+            "type": "integer",
+            "format": "int32",
+            "description": "总页数"
+          }
+        }
+      },
+      "ResultInteger": {
+        "type": "object",
+        "description": "统一返回结果",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32",
+            "description": "状态码",
+            "example": 200
+          },
+          "message": {
+            "type": "string",
+            "description": "消息",
+            "example": "success"
+          },
+          "data": {
+            "type": "integer",
+            "format": "int32",
+            "description": "数据"
+          }
+        }
+      },
+      "OrderQueryDTO": {
+        "type": "object",
+        "description": "订单查询请求",
+        "properties": {
+          "orderNo": {
+            "type": "string",
+            "description": "订单号"
+          },
+          "userId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "用户ID"
+          },
+          "pageNum": {
+            "type": "integer",
+            "format": "int32",
+            "description": "页码"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32",
+            "description": "每页数量"
+          }
+        }
+      },
+      "ResultListOrderVO": {
+        "type": "object",
+        "description": "统一返回结果",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32",
+            "description": "状态码",
+            "example": 200
+          },
+          "message": {
+            "type": "string",
+            "description": "消息",
+            "example": "success"
+          },
+          "data": {
+            "type": "array",
+            "description": "数据",
+            "items": {
+              "$ref": "#/components/schemas/OrderVO"
+            }
+          }
+        }
+      },
+      "ResultString": {
+        "type": "object",
+        "description": "统一返回结果",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32",
+            "description": "状态码",
+            "example": 200
+          },
+          "message": {
+            "type": "string",
+            "description": "消息",
+            "example": "success"
+          },
+          "data": {
+            "type": "string",
+            "description": "数据"
+          }
+        }
+      },
+      "ResultBoolean": {
+        "type": "object",
+        "description": "统一返回结果",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32",
+            "description": "状态码",
+            "example": 200
+          },
+          "message": {
+            "type": "string",
+            "description": "消息",
+            "example": "success"
+          },
+          "data": {
+            "type": "boolean",
+            "description": "数据"
+          }
+        }
+      },
+      "ResultBigDecimal": {
+        "type": "object",
+        "description": "统一返回结果",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32",
+            "description": "状态码",
+            "example": 200
+          },
+          "message": {
+            "type": "string",
+            "description": "消息",
+            "example": "success"
+          },
+          "data": {
+            "type": "number",
+            "description": "数据"
+          }
+        }
+      },
+      "ResultListString": {
+        "type": "object",
+        "description": "统一返回结果",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32",
+            "description": "状态码",
+            "example": 200
+          },
+          "message": {
+            "type": "string",
+            "description": "消息",
+            "example": "success"
+          },
+          "data": {
+            "type": "array",
+            "description": "数据",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "ResultListProductDTO": {
+        "type": "object",
+        "description": "统一返回结果",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32",
+            "description": "状态码",
+            "example": 200
+          },
+          "message": {
+            "type": "string",
+            "description": "消息",
+            "example": "success"
+          },
+          "data": {
+            "type": "array",
+            "description": "数据",
+            "items": {
+              "$ref": "#/components/schemas/ProductDTO"
+            }
+          }
+        }
+      },
+      "ResultLong": {
+        "type": "object",
+        "description": "统一返回结果",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32",
+            "description": "状态码",
+            "example": 200
+          },
+          "message": {
+            "type": "string",
+            "description": "消息",
+            "example": "success"
+          },
+          "data": {
+            "type": "integer",
+            "format": "int64",
+            "description": "数据"
+          }
+        }
+      },
+      "UserBatchDeleteDTO": {
+        "type": "object",
+        "description": "批量删除用户请求",
+        "properties": {
+          "ids": {
+            "type": "array",
+            "description": "用户ID列表",
+            "example": [
+              1,
+              2,
+              3
+            ],
+            "items": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          "reason": {
+            "type": "string",
+            "description": "删除原因",
+            "example": "批量清理无效用户"
+          }
+        },
+        "required": [
+          "ids"
+        ]
+      }
+    }
+  }
+}
