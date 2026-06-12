@@ -29,9 +29,6 @@ function Navbar({ theme, onToggleTheme }) {
         <div className={`navbar-links ${menuOpen ? 'open' : ''}`}>
           <Link to="/" className={`nav-link ${location.pathname === '/' ? 'active' : ''}`}>home</Link>
           <Link to="/docs" className={`nav-link ${location.pathname.startsWith('/docs') ? 'active' : ''}`}>docs</Link>
-          <a href="https://gitcode.com/yudaocode/yudao-swagger-new-ui" className="nav-link" target="_blank" rel="noopener noreferrer">gitcode</a>
-          <a href="https://gitee.com/yudaocode/yudao-swagger-new-ui" className="nav-link" target="_blank" rel="noopener noreferrer">gitee</a>
-          <a href="https://github.com/yudaocode/yudao-swagger-new-ui" className="nav-link" target="_blank" rel="noopener noreferrer">github</a>
         </div>
 
         <div className="navbar-right">
