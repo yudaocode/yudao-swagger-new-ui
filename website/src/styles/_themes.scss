@@ -44,4 +44,14 @@
 
 [data-theme="light"] {
   @include light-theme;
+
+  // ── Syntax Highlighting overrides (light) ──
+  .hl-tag { color: #16A34A; }
+  .hl-attr { color: #9333EA; }
+  .hl-val { color: #B45309; }
+  .hl-comment { color: #6B7280; }
+  .hl-keyword { color: #DB2777; }
+  .hl-string { color: #16A34A; }
+  .hl-annotation { color: #D97706; }
+  .hl-number { color: #EA580C; }
 }

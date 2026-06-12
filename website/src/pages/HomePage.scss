@@ -169,6 +169,7 @@
   gap: 12px;
   margin-bottom: 0;
   animation: fade-in-up 0.6s ease-out 0.3s both;
+  flex-wrap: wrap;
 
   @media (max-width: $bp-sm) {
     flex-direction: column;
@@ -338,10 +339,6 @@
     &:hover { box-shadow: 0 4px 16px rgba(#16A34A, 0.3); }
   }
   .hero-demo-body { box-shadow: 0 10px 40px rgba(0,0,0,0.08); }
-  .hl-tag { color: #16A34A; }
-  .hl-attr { color: #9333EA; }
-  .hl-val { color: #B45309; }
-  .hl-comment { color: #6B7280; font-style: italic; }
 }
 
 // ============================================================
@@ -532,12 +529,6 @@
   background: transparent;
 }
 
-// XML 语法高亮
-.hl-tag { color: #22C55E; }       // 标签名 <dependency>
-.hl-attr { color: #C084FC; }      // 属性名 如 version 等
-.hl-val { color: #F59E0B; }      // 属性值 / 文本内容
-.hl-comment { color: #525252; font-style: italic; }  // XML 注释
-
 .qs-url {
   display: inline-flex;
   align-items: center;
@@ -683,6 +674,7 @@
   align-items: center;
   justify-content: center;
   gap: 12px;
+  flex-wrap: wrap;
 
   @media (max-width: $bp-sm) { flex-direction: column; }
 }

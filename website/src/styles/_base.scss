@@ -77,3 +77,13 @@ pre {
   background-color: rgba($accent-green, 0.3);
   color: var(--text-primary);
 }
+
+// ── Syntax Highlighting (dark) ──
+.hl-tag { color: #22C55E; }
+.hl-attr { color: #C084FC; }
+.hl-val { color: #F59E0B; }
+.hl-comment { color: #525252; font-style: italic; }
+.hl-keyword { color: #F472B6; }
+.hl-string { color: #22C55E; }
+.hl-annotation { color: #FBBF24; }
+.hl-number { color: #FB923C; }

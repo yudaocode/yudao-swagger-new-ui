@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import DocsSidebar from '../components/DocsSidebar'
+import { highlightCode } from '../utils/highlight'
 import './DocsPage.scss'
 
 const sections = [
@@ -281,7 +282,7 @@ function DocCode({ title, lang, code }) {
           <button className="doc-copy" onClick={handleCopy}>{copied ? '✓ copied' : 'copy'}</button>
         </div>
       )}
-      <pre><code>{code}</code></pre>
+      <pre><code dangerouslySetInnerHTML={{ __html: highlightCode(code, lang) }} /></pre>
     </div>
   )
 }
